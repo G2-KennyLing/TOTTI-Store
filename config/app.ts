@@ -5,10 +5,11 @@ import environment from "../environment";
 import { TestRoutes } from "../routes/user_routes";
 import { CommonRoutes } from "../routes/common_routes";
 
+
 class App {
 
    public app: express.Application;
-   public mongoUrl: string = 'mongodb://localhost/' + environment.getDBName();
+   public mongoUrl: string = 'mongodb://localhost:27017/test_db';
 
    private test_routes: TestRoutes = new TestRoutes();
    private common_routes: CommonRoutes = new CommonRoutes();
@@ -29,7 +30,12 @@ class App {
    }
 
    private mongoSetup(): void {
-      mongoose.connect(this.mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false });
+      mongoose.connect(this.mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false }).then(() => {
+         console.log("Successfully connected to the database");
+     }).catch(err => {
+         console.log('Could not connect to the database. Exiting now...', err);
+         process.exit();
+     });
    }
 
 }

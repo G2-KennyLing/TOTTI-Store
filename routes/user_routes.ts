@@ -11,6 +11,10 @@ export class TestRoutes {
             this.user_controller.create_user(req, res);
         });
 
+        app.get('/api/verify', (req: Request, res: Response) =>{
+            this.user_controller.verify_user(req, res);
+        });
+
         app.get('/api/user/:id', (req: Request, res: Response) => {
             this.user_controller.get_user(req, res);
         });

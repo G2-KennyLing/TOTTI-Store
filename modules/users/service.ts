@@ -1,11 +1,18 @@
+import { IToken } from '../tokens/model';
 import { IUser } from './model';
 import users from './schema';
+import tokens from '../tokens/schema';
 
 export default class UserService {
     
     public createUser(user_params: IUser, callback: any) {
         const _session = new users(user_params);
         _session.save(callback);
+    }
+
+    public saveToken(token_params: IToken, callback: any){
+        const _token = new tokens(token_params);
+        _token.save(callback);
     }
 
     public filterUser(query: any, callback: any) {

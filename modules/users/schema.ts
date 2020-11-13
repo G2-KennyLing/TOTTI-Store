@@ -12,8 +12,13 @@ const schema = new Schema({
         }
     },
     email: String,
+    password: String,
     phone_number: String,
     gender: String,
+    is_verified:{
+        type: Boolean,
+        default: false
+    },
     is_deleted: {
         type: Boolean,
         default: false

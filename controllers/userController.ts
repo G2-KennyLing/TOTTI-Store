@@ -4,16 +4,18 @@ import { IUser } from '../modules/users/model';
 import UserService from '../modules/users/service';
 import e = require('express');
 
+
+
+var crypto = require('crypto');
+var nodemailer = require('nodemailer');
+
 export class UserController {
 
     private user_service: UserService = new UserService();
 
     public create_user(req: Request, res: Response) {
-        // this check whether all the filds were send through the erquest or not
-        if (req.body.name && req.body.name.first_name && req.body.name.middle_name && req.body.name.last_name &&
-            req.body.email &&
-            req.body.phone_number &&
-            req.body.gender) {
+        // // this check whether all the fields were send through the request or not
+        if (req.body.name && req.body.name.first_name && req.body.name.middle_name && req.body.name.last_name && req.body.email && req.body.phone_number && req.body.gender) {
             const user_params: IUser = {
                 name: {
                     first_name: req.body.name.first_name,
@@ -21,6 +23,7 @@ export class UserController {
                     last_name: req.body.name.last_name
                 },
                 email: req.body.email,
+                password: req.body.password,
                 phone_number: req.body.phone_number,
                 gender: req.body.gender,
                 modification_notes: [{
@@ -29,6 +32,7 @@ export class UserController {
                     modification_note: 'New user created'
                 }]
             };
+
             this.user_service.createUser(user_params, (err: any, user_data: IUser) => {
                 if (err) {
                     mongoError(err, res);
@@ -36,11 +40,19 @@ export class UserController {
                     successResponse('create user successfull', user_data, res);
                 }
             });
+
         } else {
             // error response if some fields are missing in request body
             insufficientParameters(res);
         }
+        
     }
+
+
+    public verify_user(req: Request, res: Response) {
+        console.log('Verify email');
+
+    };
 
     public get_user(req: Request, res: Response) {
         if (req.params.id) {
@@ -81,6 +93,7 @@ export class UserController {
                             last_name: req.body.name.first_name ? req.body.name.last_name : user_data.name.last_name
                         } : user_data.name,
                         email: req.body.email ? req.body.email : user_data.email,
+                        password: req.body.password ? req.body.password : user_data.password,
                         phone_number: req.body.phone_number ? req.body.phone_number : user_data.phone_number,
                         gender: req.body.gender ? req.body.gender : user_data.gender,
                         is_deleted: req.body.is_deleted ? req.body.is_deleted : user_data.is_deleted,
