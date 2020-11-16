@@ -11,7 +11,7 @@ export class TestRoutes {
             this.user_controller.create_user(req, res);
         });
 
-        app.get('/api/verify', (req: Request, res: Response) =>{
+        app.get('/api/verify/:token', (req: Request, res: Response) =>{
             this.user_controller.verify_user(req, res);
         });
 
