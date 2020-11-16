@@ -1,23 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose = require("mongoose");
+const mongoose = require("../../../node_modules/mongoose");
 const model_1 = require("../common/model");
 const Schema = mongoose.Schema;
 const schema = new Schema({
     name: {
         type: {
-            firstName: String,
-            lastName: String
+            first_name: String,
+            middle_name: String,
+            last_name: String
         }
     },
     email: String,
-    password: String,
-    phoneNumber: String,
+    phone_number: String,
     gender: String,
-    is_verified: {
-        type: Boolean,
-        default: false
-    },
     is_deleted: {
         type: Boolean,
         default: false

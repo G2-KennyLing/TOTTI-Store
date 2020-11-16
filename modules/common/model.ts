@@ -1,17 +1,17 @@
 export interface ModificationNote {
-    modified_on: Date;
-    modified_by: String;
-    modification_note: String;
+    modifiedOn: Date;
+    modifiedBy: String;
+    modificationNote: String;
 }
 
 export const ModificationNote = {
-    modified_on: Date,
-    modified_by: String,
-    modification_note: String
+    modifiedOn: Date,
+    modifiedBy: String,
+    modificationNote: String
 }
 
-export enum response_status_codes {
+export enum responseStatusCodes {
     success = 200,
-    bad_request = 400,
-    internal_server_error = 500
+    badRequest = 400,
+    internalServerError = 500
 }

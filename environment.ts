@@ -26,13 +26,13 @@ class Environment {
 
     getDBName(): String {
         if (this.environment === Environments.prod_environment) {
-            return 'test_db';
+            return 'totti-store';
         } else if (this.environment === Environments.dev_environment) {
-            return 'test_db';
+            return 'totti-store';
         } else if (this.environment === Environments.qa_environment) {
-            return 'test_db';
+            return 'totti-store';
         } else {
-            return 'test_db';
+            return 'totti-store';
         }
     }
 }
