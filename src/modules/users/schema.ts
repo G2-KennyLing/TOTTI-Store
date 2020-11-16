@@ -1,4 +1,4 @@
-import * as mongoose from 'mongoose';
+import * as mongoose from '../../../node_modules/mongoose';
 import { ModificationNote } from '../common/model';
 
 const Schema = mongoose.Schema;

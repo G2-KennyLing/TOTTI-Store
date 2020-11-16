@@ -1,11 +1,11 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "main": "./dist/server.js",
+  "main": "./dist/src/server.js",
   "scripts": {
-    "test": "ts-node ./api/server.ts",
-    "dev": "tsc && nodemon ./dist/server.js",
-    "prod": "tsc && nodemon ./dist/server.js"
+    "test": "ts-node ./api/src/server.ts",
+    "dev": "tsc && nodemon ./dist/src/server.js",
+    "prod": "tsc && nodemon ./dist/src/server.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,7 +15,10 @@
     "@types/express": "^4.17.8",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
-    "mongoose": "^5.10.9",
+    "mongoose": "^5.10.12",
     "nodemon": "^2.0.6"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.7.37"
   }
 }
