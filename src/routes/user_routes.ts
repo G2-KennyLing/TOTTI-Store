@@ -1,7 +1,7 @@
 import { Application, Request, Response } from 'express';
 import { UserController } from '../controllers/userController';
 
-export class TestRoutes {
+export class UserRoutes {
 
     private userController: UserController = new UserController();
 

@@ -1,7 +1,7 @@
-import * as express from "express";
-import * as bodyParser from "body-parser";
-import * as mongoose from 'mongoose';
-import environment from "../environment";
+import * as express from "../../node_modules/express";
+import * as bodyParser from "../../node_modules/body-parser";
+import * as mongoose from '../../node_modules/mongoose';
+import environment from "../../environment";
 import { TestRoutes } from "../routes/user_routes";
 import { CommonRoutes } from "../routes/common_routes";
 
@@ -42,6 +42,8 @@ class App {
          process.exit();
      });
    }
+
+   // Cors
 
 }
 export default new App().app;

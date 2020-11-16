@@ -72,14 +72,14 @@ $ tsc
 ## Step 5: Set the scripts to run API
 Inside ‘package.json’ file update main file as follow.
 ```bash
-$ "main": "./dist/server.js"
+$ "main": "./dist/src/server.js"
 ```
 Inside ‘package.json’ file under the scripts add the following scripts.
 ```bash
 "scripts": {
-    "test": "ts-node ./api/server.ts",
-    "dev": "tsc && nodemon ./dist/server.js",
-    "prod": "tsc && nodemon ./dist/server.js"
+    "test": "ts-node ./api/src/server.ts",
+    "dev": "tsc && nodemon ./dist/src/server.js",
+    "prod": "tsc && nodemon ./dist/src/server.js"
  },
 ```
 
