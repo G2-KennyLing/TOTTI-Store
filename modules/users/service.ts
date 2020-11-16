@@ -1,10 +1,12 @@
+
 import { IUser } from './model';
 import users from './schema';
+import tokens from '../tokens/schema';
 
 export default class UserService {
     
-    public createUser(user_params: IUser, callback: any) {
-        const _session = new users(user_params);
+    public createUser(userParams: IUser, callback: any) {
+        const _session = new users(userParams);
         _session.save(callback);
     }
 
@@ -12,9 +14,9 @@ export default class UserService {
         users.findOne(query, callback);
     }
 
-    public updateUser(user_params: IUser, callback: any) {
-        const query = { _id: user_params._id };
-        users.findOneAndUpdate(query, user_params, callback);
+    public updateUser(userParams: IUser, callback: any) {
+        const query = { _id: userParams._id };
+        users.findOneAndUpdate(query, userParams, callback);
     }
     
     public deleteUser(_id: String, callback: any) {

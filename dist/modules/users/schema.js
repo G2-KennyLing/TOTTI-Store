@@ -1,8 +1,8 @@
-import * as mongoose from 'mongoose';
-import { ModificationNote } from '../common/model';
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose = require("mongoose");
+const model_1 = require("../common/model");
 const Schema = mongoose.Schema;
-
 const schema = new Schema({
     name: {
         type: {
@@ -14,15 +14,14 @@ const schema = new Schema({
     password: String,
     phoneNumber: String,
     gender: String,
-    isVerified:{
+    is_verified: {
         type: Boolean,
         default: false
     },
-    isDeleted: {
+    is_deleted: {
         type: Boolean,
         default: false
     },
-    modificationNotes: [ModificationNote]
+    modification_notes: [model_1.ModificationNote]
 });
-
-export default mongoose.model('users', schema);
+exports.default = mongoose.model('users', schema);
