@@ -7,7 +7,6 @@ const schema = new Schema({
     name: {
         type: {
             first_name: String,
-            middle_name: String,
             last_name: String
         }
     },

@@ -15,11 +15,10 @@ class UserController {
     }
     create_user(req, res) {
         // // this check whether all the fields were send through the request or not
-        if (req.body.name && req.body.name.first_name && req.body.name.middle_name && req.body.name.last_name && req.body.email && req.body.phone_number && req.body.gender) {
+        if (req.body.name && req.body.name.first_name && req.body.name.last_name && req.body.email && req.body.phone_number && req.body.gender) {
             const user_params = {
                 name: {
                     first_name: req.body.name.first_name,
-                    middle_name: req.body.name.middle_name,
                     last_name: req.body.name.last_name
                 },
                 email: req.body.email,
@@ -125,7 +124,7 @@ class UserController {
     }
     update_user(req, res) {
         if (req.params.id &&
-            req.body.name || req.body.name.first_name || req.body.name.middle_name || req.body.name.last_name ||
+            req.body.name || req.body.name.first_name || req.body.name.last_name ||
             req.body.email ||
             req.body.phone_number ||
             req.body.gender) {
@@ -144,7 +143,6 @@ class UserController {
                         _id: req.params.id,
                         name: req.body.name ? {
                             first_name: req.body.name.first_name ? req.body.name.first_name : user_data.name.first_name,
-                            middle_name: req.body.name.first_name ? req.body.name.middle_name : user_data.name.middle_name,
                             last_name: req.body.name.first_name ? req.body.name.last_name : user_data.name.last_name
                         } : user_data.name,
                         email: req.body.email ? req.body.email : user_data.email,
