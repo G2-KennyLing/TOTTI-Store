@@ -9,11 +9,8 @@ export default class TokenService {
         _token.save(callback);
     }
     
-    
     public filterToken(query: any, callback: any) {
         tokens.findOne(query, callback);
     }
-
-    
 
 }

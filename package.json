@@ -1,16 +1,16 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "main": "./dist/server.js",
+  "main": "./dist/src/server.js",
   "scripts": {
-    "test": "ts-node ./api/server.ts",
-    "dev": "tsc && nodemon ./dist/server.js",
-    "prod": "tsc && nodemon ./dist/server.js"
+    "test": "ts-node ./api/src/server.ts",
+    "dev": "tsc && nodemon ./dist/src/server.js",
+    "prod": "tsc && nodemon ./dist/src/server.js"
   },
   "author": "",
   "license": "ISC",
   "keywords": [],
-  "description": "An API (Application Programming Interface) is something like a messenger. It acts as an intermediate between two or more apps that need to talk to each other. In other words, it delivers your requests to the provider ( what you are requesting from them) and there Response (the things you request) to you. So it is a mechanism that allows the interaction between two applications using a set of rules.\r Imagine you are in a restaurant to enjoy some meals. You have a menu on your table with a lot of choices to order and in the kitchen, there is a chef who is ready to prepare your meal. But the chef can’t come and take your order because he/she is busy with cooking in the kitchen. So the waiter will take order from you and deliver it to the kitchen, telling the chef what you order (request). And when the food (response) is ready it is delivered to you by the waiter. In here, the waiter act as an API. This example will give you a basic idea of what is an API and how it will work.",
+  "description": "",
   "dependencies": {
     "@sendgrid/mail": "^7.4.0",
     "@types/express": "^4.17.8",

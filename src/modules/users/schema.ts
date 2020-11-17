@@ -1,4 +1,4 @@
-import * as mongoose from 'mongoose';
+import * as mongoose from '../../../node_modules/mongoose';
 import { ModificationNote } from '../common/model';
 
 const Schema = mongoose.Schema;
@@ -6,23 +6,23 @@ const Schema = mongoose.Schema;
 const schema = new Schema({
     name: {
         type: {
-            first_name: String,
-            last_name: String
+            firstName: String,
+            lastName: String
         }
     },
     email: String,
     password: String,
-    phone_number: String,
+    phoneNumber: String,
     gender: String,
-    is_verified:{
+    isVerified:{
         type: Boolean,
         default: false
     },
-    is_deleted: {
+    isDeleted: {
         type: Boolean,
         default: false
     },
-    modification_notes: [ModificationNote]
+    modificationNotes: [ModificationNote]
 });
 
 export default mongoose.model('users', schema);
