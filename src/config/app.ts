@@ -2,9 +2,8 @@ import * as express from "../../node_modules/express";
 import * as bodyParser from "../../node_modules/body-parser";
 import * as mongoose from '../../node_modules/mongoose';
 import environment from "../../environment";
-import { TestRoutes } from "../routes/user_routes";
+import { UserRoutes } from "../routes/user_routes";
 import { CommonRoutes } from "../routes/common_routes";
-
 
 class App {
 
@@ -12,7 +11,7 @@ class App {
    // public mongoUrl: string = 'mongodb://localhost/' + environment.getDBName();
    public mongoUrl: string = 'mongodb://localhost:27017/' + environment.getDBName();
 
-   private test_routes: TestRoutes = new TestRoutes();
+   private test_routes: UserRoutes = new UserRoutes();
    private common_routes: CommonRoutes = new CommonRoutes();
 
    constructor() {
