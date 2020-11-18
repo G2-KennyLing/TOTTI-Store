@@ -1,24 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TestRoutes = void 0;
+exports.UserRoutes = void 0;
 const userController_1 = require("../controllers/userController");
-class TestRoutes {
+class UserRoutes {
     constructor() {
-        this.user_controller = new userController_1.UserController();
+        this.userController = new userController_1.UserController();
     }
     route(app) {
         app.post('/api/user', (req, res) => {
-            this.user_controller.create_user(req, res);
+            this.userController.createUser(req, res);
+        });
+        app.get('/api/verify/:token', (req, res) => {
+            this.userController.verifyUser(req, res);
         });
         app.get('/api/user/:id', (req, res) => {
-            this.user_controller.get_user(req, res);
+            this.userController.getUser(req, res);
         });
         app.put('/api/user/:id', (req, res) => {
-            this.user_controller.update_user(req, res);
+            this.userController.updateUser(req, res);
         });
         app.delete('/api/user/:id', (req, res) => {
-            this.user_controller.delete_user(req, res);
+            this.userController.deleteUser(req, res);
         });
     }
 }
-exports.TestRoutes = TestRoutes;
+exports.UserRoutes = UserRoutes;

@@ -6,18 +6,22 @@ const Schema = mongoose.Schema;
 const schema = new Schema({
     name: {
         type: {
-            first_name: String,
-            middle_name: String,
-            last_name: String
+            firstName: String,
+            lastName: String
         }
     },
     email: String,
-    phone_number: String,
+    password: String,
+    phoneNumber: String,
     gender: String,
-    is_deleted: {
+    isVerified: {
         type: Boolean,
         default: false
     },
-    modification_notes: [model_1.ModificationNote]
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    modificationNotes: [model_1.ModificationNote]
 });
 exports.default = mongoose.model('users', schema);
