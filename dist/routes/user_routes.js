@@ -7,9 +7,9 @@ class UserRoutes {
         this.userController = new userController_1.UserController();
     }
     route(app) {
-        // app.post('/api/user', (req: Request, res: Response) => {
-        // 	this.userController.createUser(req, res);
-        // });
+        app.post('/api/login', (req, res) => {
+            this.userController.loginUser(req, res);
+        });
         app.post('/api/register', (req, res) => {
             this.userController.createUser(req, res);
         });

@@ -4,6 +4,7 @@ exports.UserController = void 0;
 const service_1 = require("../modules/common/service");
 const service_2 = require("../modules/users/service");
 const service_3 = require("../modules/tokens/service");
+const schema_1 = require("../modules/users/schema");
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey("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");
 var crypto = require('crypto');
@@ -187,6 +188,21 @@ class UserController {
         else {
             service_1.insufficientParameters(res);
         }
+    }
+    loginUser(req, res) {
+        const { email, password } = req.body;
+        schema_1.default.findOne({
+            email: email,
+            password: password
+        })
+            .then(data => {
+            if (data) {
+                res.json('Login success');
+            }
+            else {
+                res.status(300).json('Login fail, error at server');
+            }
+        });
     }
 }
 exports.UserController = UserController;

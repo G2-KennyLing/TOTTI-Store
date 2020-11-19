@@ -4,7 +4,9 @@ import { IUser } from '../modules/users/model';
 import { IToken } from '../modules/tokens/model';
 import UserService from '../modules/users/service';
 import TokenService from '../modules/tokens/service';
+import schema from '../modules/users/schema';
 import express = require('express');
+import bcrypt = require('bcrypt');
 
 const sgMail = require('@sendgrid/mail')
 sgMail.setApiKey("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")
@@ -200,7 +202,18 @@ export class UserController {
 		}
 	}
 
-	public loginUser(req: Request, res: Response) {
-		
-	}
+	// public loginUser(req: Request, res: Response) {
+    //     const { email, password } = req.body;
+    //     schema.findOne({
+    //         email: email,
+    //         password: password
+    //     })
+    //     .then(data=>{
+    //         if(data){
+    //             res.status(200).json('Login success');
+    //         }else{
+    //             res.status(300).json('Login fail, error at server');
+    //         }
+    //     })
+	// }
 }
