@@ -1,7 +1,6 @@
 
 import { IUser } from './model';
 import users from './schema';
-import tokens from '../tokens/schema';
 
 export default class UserService {
     

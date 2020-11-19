@@ -48,12 +48,12 @@ export class UserController {
                         }
                 });
 
-                    console.log("token", tokenParams.token)
+                    console.log("New token created", tokenParams.token)
                     var messsage = 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api/verify\/' + tokenParams.token + '.\n'
 
                     const msg = {
                         to: userData.email, // Change to your recipient
-                        from: 'helloleotech@gmail.com', // Change to your verified sender
+                        from: 'vagabond2610@gmail.com', // Change to your verified sender
                         subject: 'Confirm Account',
                         text: 'Please confirm your account!!!!',
                         html: '<strong>Click here to verify your account</strong> ' + messsage,
@@ -63,7 +63,7 @@ export class UserController {
                     sgMail
                         .send(msg)
                         .then(() => {
-                            successResponse('create user and token successfull', userData, res);
+                            successResponse('Create user and token successfull', userData, res);
 
                         })
                         .catch((error) => {
@@ -164,6 +164,7 @@ export class UserController {
                         password: req.body.password ? req.body.password : userData.password,
                         phoneNumber: req.body.phoneNumber ? req.body.phoneNumber : userData.phoneNumber,
                         gender: req.body.gender ? req.body.gender : userData.gender,
+                        isVerified: req.body.isVerified ? req.body.isVerified : userData.isVerified,
                         isDeleted: req.body.isDeleted ? req.body.isDeleted : userData.isDeleted,
                         modificationNotes: userData.modificationNotes
                     };
