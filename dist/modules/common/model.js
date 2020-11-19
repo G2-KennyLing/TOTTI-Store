@@ -1,14 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.response_status_codes = exports.ModificationNote = void 0;
+exports.responseStatusCodes = exports.ModificationNote = void 0;
 exports.ModificationNote = {
-    modified_on: Date,
-    modified_by: String,
-    modification_note: String
+    modifiedOn: Date,
+    modifiedBy: String,
+    modificationNote: String
 };
-var response_status_codes;
-(function (response_status_codes) {
-    response_status_codes[response_status_codes["success"] = 200] = "success";
-    response_status_codes[response_status_codes["bad_request"] = 400] = "bad_request";
-    response_status_codes[response_status_codes["internal_server_error"] = 500] = "internal_server_error";
-})(response_status_codes = exports.response_status_codes || (exports.response_status_codes = {}));
+var responseStatusCodes;
+(function (responseStatusCodes) {
+    responseStatusCodes[responseStatusCodes["success"] = 200] = "success";
+    responseStatusCodes[responseStatusCodes["badRequest"] = 400] = "badRequest";
+    responseStatusCodes[responseStatusCodes["internalServerError"] = 500] = "internalServerError";
+})(responseStatusCodes = exports.responseStatusCodes || (exports.responseStatusCodes = {}));

@@ -4,49 +4,50 @@ exports.UserController = void 0;
 const service_1 = require("../modules/common/service");
 const service_2 = require("../modules/users/service");
 const service_3 = require("../modules/tokens/service");
+const schema_1 = require("../modules/users/schema");
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey("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");
 var crypto = require('crypto');
 var nodemailer = require('nodemailer');
 class UserController {
     constructor() {
-        this.user_service = new service_2.default();
-        this.token_service = new service_3.default();
+        this.userService = new service_2.default();
+        this.tokenService = new service_3.default();
     }
-    create_user(req, res) {
+    createUser(req, res) {
         // // this check whether all the fields were send through the request or not
-        if (req.body.name && req.body.name.first_name && req.body.name.last_name && req.body.email && req.body.phone_number && req.body.gender) {
-            const user_params = {
+        if (req.body.name && req.body.name.firstName && req.body.name.lastName && req.body.email && req.body.phoneNumber && req.body.gender) {
+            const userParams = {
                 name: {
-                    first_name: req.body.name.first_name,
-                    last_name: req.body.name.last_name
+                    firstName: req.body.name.firstName,
+                    lastName: req.body.name.lastName
                 },
                 email: req.body.email,
                 password: req.body.password,
-                phone_number: req.body.phone_number,
+                phoneNumber: req.body.phoneNumber,
                 gender: req.body.gender,
-                modification_notes: [{
-                        modified_on: new Date(Date.now()),
-                        modified_by: null,
-                        modification_note: 'New user created'
+                modificationNotes: [{
+                        modifiedOn: new Date(Date.now()),
+                        modifiedBy: null,
+                        modificationNote: 'New user created'
                     }]
             };
-            this.user_service.createUser(user_params, (err, user_data) => {
+            this.userService.createUser(userParams, (err, userData) => {
                 if (err) {
                     service_1.mongoError(err, res);
                 }
                 else {
                     // Create a verification token for this user
-                    const token_params = ({ _userId: user_data._id, token: crypto.randomBytes(16).toString('hex') });
-                    this.token_service.createToken(token_params, (err, token_data) => {
+                    const tokenParams = ({ _userId: userData._id, token: crypto.randomBytes(16).toString('hex') });
+                    this.tokenService.createToken(tokenParams, (err, tokenData) => {
                         if (err) {
                             service_1.mongoError(err, res);
                         }
                     });
-                    console.log("token", token_params.token);
-                    var messsage = 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api/verify\/' + token_params.token + '.\n';
+                    console.log("token", tokenParams.token);
+                    var messsage = 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api/verify\/' + tokenParams.token + '.\n';
                     const msg = {
-                        to: user_data.email,
+                        to: userData.email,
                         from: 'vagabond2610@gmail.com',
                         subject: 'Confirm Account',
                         text: 'Please confirm your account!!!!',
@@ -55,7 +56,7 @@ class UserController {
                     sgMail
                         .send(msg)
                         .then(() => {
-                        service_1.successResponse('create user and token successfull', user_data, res);
+                        service_1.successResponse('create user and token successfull', userData, res);
                     })
                         .catch((error) => {
                         console.error(error);
@@ -69,17 +70,17 @@ class UserController {
             service_1.insufficientParameters(res);
         }
     }
-    verify_user(req, res) {
+    verifyUser(req, res) {
         console.log('Verify email!!!', req.params.token);
         // Check for validation errors  
-        const token_filter = { token: req.params.token };
-        this.token_service.filterToken(token_filter, (err, token_data) => {
+        const tokenFilter = { token: req.params.token };
+        this.tokenService.filterToken(tokenFilter, (err, tokenData) => {
             if (err) {
                 service_1.mongoError(err, res);
             }
             else {
-                const user_filter = { _id: token_data._userId };
-                this.user_service.filterUser(user_filter, (err, user_data) => {
+                const userFilter = { _id: tokenData._userId };
+                this.userService.filterUser(userFilter, (err, userData) => {
                     if (err) {
                         service_1.mongoError(err, res);
                     }
@@ -106,15 +107,15 @@ class UserController {
         //     });
     }
     ;
-    get_user(req, res) {
+    getUser(req, res) {
         if (req.params.id) {
-            const user_filter = { _id: req.params.id };
-            this.user_service.filterUser(user_filter, (err, user_data) => {
+            const userFilter = { _id: req.params.id };
+            this.userService.filterUser(userFilter, (err, userData) => {
                 if (err) {
                     service_1.mongoError(err, res);
                 }
                 else {
-                    service_1.successResponse('get user successfull', user_data, res);
+                    service_1.successResponse('Get user successfull', userData, res);
                 }
             });
         }
@@ -122,47 +123,47 @@ class UserController {
             service_1.insufficientParameters(res);
         }
     }
-    update_user(req, res) {
+    updateUser(req, res) {
         if (req.params.id &&
-            req.body.name || req.body.name.first_name || req.body.name.last_name ||
+            req.body.name || req.body.name.firstName || req.body.name.lastName ||
             req.body.email ||
-            req.body.phone_number ||
+            req.body.phoneNumber ||
             req.body.gender) {
-            const user_filter = { _id: req.params.id };
-            this.user_service.filterUser(user_filter, (err, user_data) => {
+            const userFilter = { _id: req.params.id };
+            this.userService.filterUser(userFilter, (err, userData) => {
                 if (err) {
                     service_1.mongoError(err, res);
                 }
-                else if (user_data) {
-                    user_data.modification_notes.push({
-                        modified_on: new Date(Date.now()),
-                        modified_by: null,
-                        modification_note: 'User data updated'
+                else if (userData) {
+                    userData.modificationNotes.push({
+                        modifiedOn: new Date(Date.now()),
+                        modifiedBy: null,
+                        modificationNote: 'User data updated'
                     });
-                    const user_params = {
+                    const userParams = {
                         _id: req.params.id,
                         name: req.body.name ? {
-                            first_name: req.body.name.first_name ? req.body.name.first_name : user_data.name.first_name,
-                            last_name: req.body.name.first_name ? req.body.name.last_name : user_data.name.last_name
-                        } : user_data.name,
-                        email: req.body.email ? req.body.email : user_data.email,
-                        password: req.body.password ? req.body.password : user_data.password,
-                        phone_number: req.body.phone_number ? req.body.phone_number : user_data.phone_number,
-                        gender: req.body.gender ? req.body.gender : user_data.gender,
-                        is_deleted: req.body.is_deleted ? req.body.is_deleted : user_data.is_deleted,
-                        modification_notes: user_data.modification_notes
+                            firstName: req.body.name.firstName ? req.body.name.firstName : userData.name.firstName,
+                            lastName: req.body.name.firstName ? req.body.name.lastName : userData.name.lastName
+                        } : userData.name,
+                        email: req.body.email ? req.body.email : userData.email,
+                        password: req.body.password ? req.body.password : userData.password,
+                        phoneNumber: req.body.phoneNumber ? req.body.phoneNumber : userData.phoneNumber,
+                        gender: req.body.gender ? req.body.gender : userData.gender,
+                        isDeleted: req.body.isDeleted ? req.body.isDeleted : userData.isDeleted,
+                        modificationNotes: userData.modificationNotes
                     };
-                    this.user_service.updateUser(user_params, (err) => {
+                    this.userService.updateUser(userParams, (err) => {
                         if (err) {
                             service_1.mongoError(err, res);
                         }
                         else {
-                            service_1.successResponse('update user successfull', null, res);
+                            service_1.successResponse('Update user successfull', null, res);
                         }
                     });
                 }
                 else {
-                    service_1.failureResponse('invalid user', null, res);
+                    service_1.failureResponse('Invalid user', null, res);
                 }
             });
         }
@@ -170,23 +171,38 @@ class UserController {
             service_1.insufficientParameters(res);
         }
     }
-    delete_user(req, res) {
+    deleteUser(req, res) {
         if (req.params.id) {
-            this.user_service.deleteUser(req.params.id, (err, delete_details) => {
+            this.userService.deleteUser(req.params.id, (err, deleteDetails) => {
                 if (err) {
                     service_1.mongoError(err, res);
                 }
-                else if (delete_details.deletedCount !== 0) {
-                    service_1.successResponse('delete user successfull', null, res);
+                else if (deleteDetails.deletedCount !== 0) {
+                    service_1.successResponse('Delete user successfull', null, res);
                 }
                 else {
-                    service_1.failureResponse('invalid user', null, res);
+                    service_1.failureResponse('Invalid user', null, res);
                 }
             });
         }
         else {
             service_1.insufficientParameters(res);
         }
+    }
+    loginUser(req, res) {
+        const { email, password } = req.body;
+        schema_1.default.findOne({
+            email: email,
+            password: password
+        })
+            .then(data => {
+            if (data) {
+                res.json('Login success');
+            }
+            else {
+                res.status(300).json('Login fail, error at server');
+            }
+        });
     }
 }
 exports.UserController = UserController;
