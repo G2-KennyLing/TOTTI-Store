@@ -22,7 +22,7 @@ export class UserController {
 	public createUser(req: Request, res: Response) {
 		// // this check whether all the fields were send through the request or not
 		if (req.body.name && req.body.name.firstName && req.body.name.lastName && req.body.email && req.body.phoneNumber && req.body.gender) {
-			
+
 			const userParams: IUser = {
 				name: {
 					firstName: req.body.name.firstName,
@@ -30,6 +30,8 @@ export class UserController {
 				},
 				email: req.body.email,
 				password: req.body.password,
+				resetPasswordToken: req.body.resetPasswordToken,
+				resetPasswordExpires: req.body.resetPasswordExpires,
 				phoneNumber: req.body.phoneNumber,
 				gender: req.body.gender,
 				modificationNotes: [{
@@ -49,7 +51,7 @@ export class UserController {
 						if (err) {
 							mongoError(err, res);
 						}
-				});
+					});
 
 					console.log("token", tokenParams.token)
 					var messsage = 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api/verify\/' + tokenParams.token + '.\n'
@@ -106,23 +108,23 @@ export class UserController {
 		});
 
 
-	//     // Find a matching token
-	//     IToken.findOne({ token: req.params.token }, function (err, token) {
-	//         if (!token) return res.status(400).send({ type: 'not-verified', msg: 'We were unable to find a valid token. Your token my have expired.' });
+		//     // Find a matching token
+		//     IToken.findOne({ token: req.params.token }, function (err, token) {
+		//         if (!token) return res.status(400).send({ type: 'not-verified', msg: 'We were unable to find a valid token. Your token my have expired.' });
 
-	//         // If we found a token, find a matching user
-	//         IUser.findOne({ _id: token._userId, email: req.body.email }, function (err, user) {
-	//             if (!user) return res.status(400).send({ msg: 'We were unable to find a user for this token.' });
-	//             if (user.isVerified) return res.status(400).send({ type: 'already-verified', msg: 'This user has already been verified.' });
+		//         // If we found a token, find a matching user
+		//         IUser.findOne({ _id: token._userId, email: req.body.email }, function (err, user) {
+		//             if (!user) return res.status(400).send({ msg: 'We were unable to find a user for this token.' });
+		//             if (user.isVerified) return res.status(400).send({ type: 'already-verified', msg: 'This user has already been verified.' });
 
-	//             // Verify and save the user
-	//             user.isVerified = true;
-	//             user.save(function (err) {
-	//                 if (err) { return res.status(500).send({ msg: err.message }); }
-	//                 res.status(200).send("The account has been verified. Please log in.");
-	//             });
-	//         });
-	//     });
+		//             // Verify and save the user
+		//             user.isVerified = true;
+		//             user.save(function (err) {
+		//                 if (err) { return res.status(500).send({ msg: err.message }); }
+		//                 res.status(200).send("The account has been verified. Please log in.");
+		//             });
+		//         });
+		//     });
 
 	};
 
@@ -142,11 +144,7 @@ export class UserController {
 	}
 
 	public updateUser(req: Request, res: Response) {
-		if (req.params.id &&
-			req.body.name || req.body.name.firstName || req.body.name.lastName ||
-			req.body.email ||
-			req.body.phoneNumber ||
-			req.body.gender) {
+		if (req.params.id && req.body.name || req.body.name.firstName || req.body.name.lastName || req.body.email || req.body.phoneNumber || req.body.gender) {
 			const userFilter = { _id: req.params.id };
 			this.userService.filterUser(userFilter, (err: any, userData: IUser) => {
 				if (err) {
@@ -165,6 +163,8 @@ export class UserController {
 						} : userData.name,
 						email: req.body.email ? req.body.email : userData.email,
 						password: req.body.password ? req.body.password : userData.password,
+						resetPasswordToken: req.body.resetPasswordToken ? req.body.resetPasswordToken : userData.resetPasswordToken,
+						resetPasswordExpires: req.body.resetPasswordExpires ? req.body.resetPasswordExpires : userData.resetPasswordExpires,
 						phoneNumber: req.body.phoneNumber ? req.body.phoneNumber : userData.phoneNumber,
 						gender: req.body.gender ? req.body.gender : userData.gender,
 						isDeleted: req.body.isDeleted ? req.body.isDeleted : userData.isDeleted,
@@ -203,17 +203,131 @@ export class UserController {
 	}
 
 	// public loginUser(req: Request, res: Response) {
-    //     const { email, password } = req.body;
-    //     schema.findOne({
-    //         email: email,
-    //         password: password
-    //     })
-    //     .then(data=>{
-    //         if(data){
-    //             res.status(200).json('Login success');
-    //         }else{
-    //             res.status(300).json('Login fail, error at server');
-    //         }
-    //     })
+	//     const { email, password } = req.body;
+	//     schema.findOne({
+	//         email: email,
+	//         password: password
+	//     })
+	//     .then(data=>{
+	//         if(data){
+	//             res.status(200).json('Login success');
+	//         }else{
+	//             res.status(300).json('Login fail, error at server');
+	//         }
+	//     })
 	// }
+
+	public forgotPassword(req: Request, res: Response) {
+		const userFilter = { email: req.params.email };
+		this.userService.filterUser(userFilter, (err: any, userData: IUser) => {
+			if (err) {
+				failureResponse('Email khong ton tai', userData, res)
+			} else if (userData) {
+				userData.modificationNotes.push({
+					modifiedOn: new Date(Date.now()),
+					modifiedBy: null,
+					modificationNote: 'User data updated'
+				});
+				var token = crypto.randomBytes(20).toString('hex');
+				var date = new Date(Date.now() + 36000);
+
+				const userParams: IUser = {
+					_id: req.params.id,
+					name: req.body.name ? {
+						firstName: req.body.name.firstName ? req.body.name.firstName : userData.name.firstName,
+						lastName: req.body.name.firstName ? req.body.name.lastName : userData.name.lastName
+					} : userData.name,
+					email: req.body.email ? req.body.email : userData.email,
+					password: req.body.password ? req.body.password : userData.password,
+					resetPasswordToken: req.body.resetPasswordToken ? token : userData.resetPasswordToken,
+					resetPasswordExpires: req.body.resetPasswordExpires ? date : userData.resetPasswordExpires,
+					phoneNumber: req.body.phoneNumber ? req.body.phoneNumber : userData.phoneNumber,
+					gender: req.body.gender ? req.body.gender : userData.gender,
+					isDeleted: req.body.isDeleted ? req.body.isDeleted : userData.isDeleted,
+					modificationNotes: userData.modificationNotes
+				};
+				this.userService.updateUser(userParams, (err: any) => {
+					if (err) {
+						mongoError(err, res);
+					} else {
+						successResponse('Create reset token successfull', null, res);
+					}
+				});
+				// var messsage = 'Hello,\n\n' + 'Please change your password account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/forgot-password\/' + token + '.\n'
+
+				// const msg = {
+				// 	to: userData.email, // Change to your recipient
+				// 	from: 'vagabond2610@gmail.com', // Change to your verified sender
+				// 	subject: 'Confirm Account',
+				// 	text: 'Please change your password account!!!!',
+				// 	html: '<strong>Click here to change your password account</strong> ' + messsage,
+
+				// }
+
+				// sgMail
+				// 	.send(msg)
+				// 	.then(() => {
+				// 		successResponse('create user and token successfull', userData, res);
+
+				// 	})
+				// 	.catch((error) => {
+				// 		console.error(error)
+				// 		console.log(error.response.body.errors)
+				// 	});
+			}
+			else {
+				failureResponse('Invalid user', null, res);
+			}
+		});
+
+	}
+
+	public resetPassword(req: Request, res: Response) {
+		const userFilter = { resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } };
+		this.userService.filterUser(userFilter, (err: any, userData: IUser) => {
+			if (err) {
+				failureResponse('Password reset token is invalid or has expired.', err, null)
+			} else {
+				successResponse('Get user successfull', userData, res);
+			}
+		});
+	}
+
+	public confirmPassword(req: Request, res: Response) {
+		const userFilter = { resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } };
+		this.userService.filterUser(userFilter, (err: any, userData: IUser) => {
+			if (err) {
+				failureResponse('Password reset token is invalid or has expired.', err, null)
+			} else if (userData) {
+				userData.modificationNotes.push({
+					modifiedOn: new Date(Date.now()),
+					modifiedBy: null,
+					modificationNote: 'User data updated'
+				});
+				const userParams: IUser = {
+					_id: req.params.id,
+					name: req.body.name ? {
+						firstName: req.body.name.firstName ? req.body.name.firstName : userData.name.firstName,
+						lastName: req.body.name.firstName ? req.body.name.lastName : userData.name.lastName
+					} : userData.name,
+					email: req.body.email ? req.body.email : userData.email,
+					password: req.body.password ? req.body.password : userData.password,
+					resetPasswordToken: req.body.resetPasswordToken ? req.body.resetPasswordToken : userData.resetPasswordToken,
+					resetPasswordExpires: req.body.resetPasswordExpires ? req.body.resetPasswordExpires : userData.resetPasswordExpires,
+					phoneNumber: req.body.phoneNumber ? req.body.phoneNumber : userData.phoneNumber,
+					gender: req.body.gender ? req.body.gender : userData.gender,
+					isDeleted: req.body.isDeleted ? req.body.isDeleted : userData.isDeleted,
+					modificationNotes: userData.modificationNotes
+				};
+				this.userService.updateUser(userParams, (err: any) => {
+					if (err) {
+						mongoError(err, res);
+					} else {
+						successResponse('Update user successfull', null, res);
+					}
+				});
+				
+			}
+		});
+	}
 }
