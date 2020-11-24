@@ -4,12 +4,11 @@ import joi = require("joi");
 
 const Schema = mongoose.Schema;
 
-const schema = new Schema({
+const User = new Schema({
 	name: {
 		type: {
 			firstName: String,
 			lastName: String,
-
 		}
 	},
 	email: String,
@@ -27,4 +26,4 @@ const schema = new Schema({
 	modificationNotes: [ModificationNote]
 });
 
-export default mongoose.model('users', schema);
+export default mongoose.model('users', User);

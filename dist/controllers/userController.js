@@ -5,8 +5,11 @@ const service_1 = require("../modules/common/service");
 const service_2 = require("../modules/users/service");
 const service_3 = require("../modules/tokens/service");
 const schema_1 = require("../modules/users/schema");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey("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");
+// sgMail.setApiKey("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");
 var crypto = require('crypto');
 var nodemailer = require('nodemailer');
 class UserController {
@@ -16,14 +19,16 @@ class UserController {
     }
     createUser(req, res) {
         // // this check whether all the fields were send through the request or not
+        const saltRounds = 10;
         if (req.body.name && req.body.name.firstName && req.body.name.lastName && req.body.email && req.body.phoneNumber && req.body.gender) {
+            const hash = bcrypt.hashSync(req.body.password, saltRounds);
             const userParams = {
                 name: {
                     firstName: req.body.name.firstName,
                     lastName: req.body.name.lastName
                 },
                 email: req.body.email,
-                password: req.body.password,
+                password: hash,
                 phoneNumber: req.body.phoneNumber,
                 gender: req.body.gender,
                 modificationNotes: [{
@@ -44,19 +49,19 @@ class UserController {
                             service_1.mongoError(err, res);
                         }
                     });
-                    console.log("token", tokenParams.token);
-                    var messsage = 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api/verify\/' + tokenParams.token + '.\n';
+                    // console.log("token", tokenParams.token)
+                    var message = ' Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api/verify\/' + tokenParams.token + '.\n';
                     const msg = {
                         to: userData.email,
+                        // from: 'quocdatliver@gmail.com', // Change to your verified sender
                         from: 'vagabond2610@gmail.com',
-                        subject: 'Confirm Account',
-                        text: 'Please confirm your account!!!!',
-                        html: '<strong>Click here to verify your account</strong> ' + messsage,
+                        subject: 'Confirm Email',
+                        text: 'Please confirm your email!!!!',
+                        html: '<strong>Please click this email to confirm your email</strong>' + message,
                     };
-                    sgMail
-                        .send(msg)
+                    sgMail.send(msg)
                         .then(() => {
-                        service_1.successResponse('create user and token successfull', userData, res);
+                        service_1.successResponse('create user and token successful', userData, res);
                     })
                         .catch((error) => {
                         console.error(error);
@@ -115,7 +120,7 @@ class UserController {
                     service_1.mongoError(err, res);
                 }
                 else {
-                    service_1.successResponse('Get user successfull', userData, res);
+                    service_1.successResponse('Get user successful', userData, res);
                 }
             });
         }
@@ -158,7 +163,7 @@ class UserController {
                             service_1.mongoError(err, res);
                         }
                         else {
-                            service_1.successResponse('Update user successfull', null, res);
+                            service_1.successResponse('Update user successful', null, res);
                         }
                     });
                 }
@@ -178,7 +183,7 @@ class UserController {
                     service_1.mongoError(err, res);
                 }
                 else if (deleteDetails.deletedCount !== 0) {
-                    service_1.successResponse('Delete user successfull', null, res);
+                    service_1.successResponse('Delete user successful', null, res);
                 }
                 else {
                     service_1.failureResponse('Invalid user', null, res);
@@ -191,16 +196,33 @@ class UserController {
     }
     loginUser(req, res) {
         const { email, password } = req.body;
-        schema_1.default.findOne({
-            email: email,
-            password: password
-        })
-            .then(data => {
-            if (data) {
-                res.json('Login success');
+        schema_1.default.findOne({ $or: [{ email: email }] })
+            .then((User) => {
+            if (User) {
+                bcrypt.compare(password, User.password, function (err, result) {
+                    if (err) {
+                        res.json({
+                            error: err
+                        });
+                    }
+                    if (result) {
+                        let token = jwt.sign({ name: User.name }, 'verySecretValue', { expiresIn: '3h' });
+                        res.json({
+                            message: 'Login success',
+                            token
+                        });
+                    }
+                    else {
+                        res.json({
+                            message: 'Password not match'
+                        });
+                    }
+                });
             }
             else {
-                res.status(300).json('Login fail, error at server');
+                res.json({
+                    message: 'No User found'
+                });
             }
         });
     }

@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose = require("../../../node_modules/mongoose");
 const model_1 = require("../common/model");
 const Schema = mongoose.Schema;
-const schema = new Schema({
+const User = new Schema({
     name: {
         type: {
             firstName: String,
@@ -24,4 +24,4 @@ const schema = new Schema({
     },
     modificationNotes: [model_1.ModificationNote]
 });
-exports.default = mongoose.model('users', schema);
+exports.default = mongoose.model('users', User);

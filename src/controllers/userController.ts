@@ -4,12 +4,14 @@ import { IUser } from '../modules/users/model';
 import { IToken } from '../modules/tokens/model';
 import UserService from '../modules/users/service';
 import TokenService from '../modules/tokens/service';
-import schema from '../modules/users/schema';
+import User from '../modules/users/schema';
 import express = require('express');
 import bcrypt = require('bcrypt');
+import jwt = require('jsonwebtoken');
 
 const sgMail = require('@sendgrid/mail')
 sgMail.setApiKey("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")
+// sgMail.setApiKey("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");
 
 var crypto = require('crypto');
 var nodemailer = require('nodemailer');
@@ -21,7 +23,9 @@ export class UserController {
 
 	public createUser(req: Request, res: Response) {
 		// // this check whether all the fields were send through the request or not
+		const saltRounds = 10; 
 		if (req.body.name && req.body.name.firstName && req.body.name.lastName && req.body.email && req.body.phoneNumber && req.body.gender) {
+			const hash = bcrypt.hashSync(req.body.password, saltRounds);
 			
 			const userParams: IUser = {
 				name: {
@@ -29,7 +33,7 @@ export class UserController {
 					lastName: req.body.name.lastName
 				},
 				email: req.body.email,
-				password: req.body.password,
+				password: hash,
 				phoneNumber: req.body.phoneNumber,
 				gender: req.body.gender,
 				modificationNotes: [{
@@ -49,34 +53,30 @@ export class UserController {
 						if (err) {
 							mongoError(err, res);
 						}
-				});
-
-					console.log("token", tokenParams.token)
-					var messsage = 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api/verify\/' + tokenParams.token + '.\n'
+					});
+					
+					// console.log("token", tokenParams.token)
+					var message = ' Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api/verify\/' + tokenParams.token + '.\n'
 
 					const msg = {
 						to: userData.email, // Change to your recipient
-						from: 'vagabond2610@gmail.com', // Change to your verified sender
-						subject: 'Confirm Account',
-						text: 'Please confirm your account!!!!',
-						html: '<strong>Click here to verify your account</strong> ' + messsage,
-
+						// from: 'quocdatliver@gmail.com', // Change to your verified sender
+						from: 'vagabond2610@gmail.com',
+						subject: 'Confirm Email',
+						text: 'Please confirm your email!!!!',
+						html: '<strong>Please click this email to confirm your email</strong>' + message,
 					}
-
-					sgMail
-						.send(msg)
+					sgMail.send(msg)
 						.then(() => {
-							successResponse('create user and token successfull', userData, res);
-
+							successResponse('create user and token successful', userData, res);
 						})
 						.catch((error) => {
 							console.error(error)
 							console.log(error.response.body.errors)
 						});
 				}
-			});
-
-		} else {
+            });
+		}  else {
 			// error response if some fields are missing in request body
 			insufficientParameters(res);
 		}
@@ -133,7 +133,7 @@ export class UserController {
 				if (err) {
 					mongoError(err, res);
 				} else {
-					successResponse('Get user successfull', userData, res);
+					successResponse('Get user successful', userData, res);
 				}
 			});
 		} else {
@@ -174,7 +174,7 @@ export class UserController {
 						if (err) {
 							mongoError(err, res);
 						} else {
-							successResponse('Update user successfull', null, res);
+							successResponse('Update user successful', null, res);
 						}
 					});
 				} else {
@@ -192,7 +192,7 @@ export class UserController {
 				if (err) {
 					mongoError(err, res);
 				} else if (deleteDetails.deletedCount !== 0) {
-					successResponse('Delete user successfull', null, res);
+					successResponse('Delete user successful', null, res);
 				} else {
 					failureResponse('Invalid user', null, res);
 				}
@@ -202,18 +202,34 @@ export class UserController {
 		}
 	}
 
-	// public loginUser(req: Request, res: Response) {
-    //     const { email, password } = req.body;
-    //     schema.findOne({
-    //         email: email,
-    //         password: password
-    //     })
-    //     .then(data=>{
-    //         if(data){
-    //             res.status(200).json('Login success');
-    //         }else{
-    //             res.status(300).json('Login fail, error at server');
-    //         }
-    //     })
-	// }
+	public loginUser(req: Request, res: Response) {
+        const { email, password } = req.body;
+		User.findOne({$or: [ {email: email} ]})
+		.then((User) => {
+			if(User) {
+				bcrypt.compare(password, User.password, function (err, result) {
+					if(err) {
+						res.json({
+							error: err
+						})
+					}
+					if(result) {
+						let token = jwt.sign({ name: User.name }, 'verySecretValue', {expiresIn: '3h'})
+						res.json({
+							message: 'Login success',
+							token
+						})
+					}else {
+						res.json({
+							message: 'Password not match'
+						})
+					}
+				})
+			}else {
+				res.json({
+					message: 'No User found'
+				})
+			}
+		})
+	}
 }
