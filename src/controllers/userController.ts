@@ -218,18 +218,21 @@ export class UserController {
 	// }
 
 	public forgotPassword(req: Request, res: Response) {
-		const userFilter = { email: req.params.email };
+
+		const userFilter = { email: req.body.email };
 		this.userService.filterUser(userFilter, (err: any, userData: IUser) => {
 			if (err) {
 				failureResponse('Email khong ton tai', userData, res)
 			} else if (userData) {
+				successResponse('Ton tai email',userData, res)
 				userData.modificationNotes.push({
 					modifiedOn: new Date(Date.now()),
 					modifiedBy: null,
 					modificationNote: 'User data updated'
 				});
-				var token = crypto.randomBytes(20).toString('hex');
-				var date = new Date(Date.now() + 36000);
+				const token = crypto.randomBytes(20).toString('hex');
+				const date = new Date(Date.now());
+				console.log(token, date);
 
 				const userParams: IUser = {
 					_id: req.params.id,
@@ -239,14 +242,14 @@ export class UserController {
 					} : userData.name,
 					email: req.body.email ? req.body.email : userData.email,
 					password: req.body.password ? req.body.password : userData.password,
-					resetPasswordToken: req.body.resetPasswordToken ? token : userData.resetPasswordToken,
-					resetPasswordExpires: req.body.resetPasswordExpires ? date : userData.resetPasswordExpires,
+					resetPasswordToken: token ? token : userData.resetPasswordToken,
+					resetPasswordExpires: date ? date : userData.resetPasswordExpires,
 					phoneNumber: req.body.phoneNumber ? req.body.phoneNumber : userData.phoneNumber,
 					gender: req.body.gender ? req.body.gender : userData.gender,
 					isDeleted: req.body.isDeleted ? req.body.isDeleted : userData.isDeleted,
 					modificationNotes: userData.modificationNotes
 				};
-				this.userService.updateUser(userParams, (err: any) => {
+				this.userService.updateToken(userParams, (err: any) => {
 					if (err) {
 						mongoError(err, res);
 					} else {
@@ -279,7 +282,6 @@ export class UserController {
 				failureResponse('Invalid user', null, res);
 			}
 		});
-
 	}
 
 	public resetPassword(req: Request, res: Response) {
@@ -323,7 +325,7 @@ export class UserController {
 					if (err) {
 						mongoError(err, res);
 					} else {
-						successResponse('Update user successfull', null, res);
+						successResponse('Change your password successfull', null, res);
 					}
 				});
 				

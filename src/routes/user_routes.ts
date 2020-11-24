@@ -39,7 +39,7 @@ export class UserRoutes {
 			this.userController.deleteUser(req, res);
 		});
 
-		app.put('/forgot-password/:email', (req: Request, res: Response) =>{
+		app.put('/forgot-password', (req: Request, res: Response) =>{
 			this.userController.forgotPassword(req, res);
 		})
 
