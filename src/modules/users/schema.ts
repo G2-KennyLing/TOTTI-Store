@@ -1,4 +1,4 @@
-import * as mongoose from '../../../node_modules/mongoose';
+import * as mongoose from 'mongoose';
 import { ModificationNote } from '../common/model';
 import joi = require("joi");
 

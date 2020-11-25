@@ -202,34 +202,34 @@ export class UserController {
 		}
 	}
 
-	public loginUser(req: Request, res: Response) {
-        const { email, password } = req.body;
-		User.findOne({$or: [ {email: email} ]})
-		.then((User) => {
-			if(User) {
-				bcrypt.compare(password, User.password, function (err, result) {
-					if(err) {
-						res.json({
-							error: err
-						})
-					}
-					if(result) {
-						let token = jwt.sign({ name: User.name }, 'verySecretValue', {expiresIn: '3h'})
-						res.json({
-							message: 'Login success',
-							token
-						})
-					}else {
-						res.json({
-							message: 'Password not match'
-						})
-					}
-				})
-			}else {
-				res.json({
-					message: 'No User found'
-				})
-			}
-		})
-	}
+	// public loginUser(req: Request, res: Response) {
+    //     const { email, password } = req.body;
+	// 	User.findOne({$or: [ {email: email} ]})
+	// 	.then((User) => {
+	// 		if(User) {
+	// 			bcrypt.compare(password, User.password, function (err, result) {
+	// 				if(err) {
+	// 					res.json({
+	// 						error: err
+	// 					})
+	// 				}
+	// 				if(result) {
+	// 					let token = jwt.sign({ name: User.name }, 'verySecretValue', {expiresIn: '3h'})
+	// 					res.json({
+	// 						message: 'Login success',
+	// 						token
+	// 					})
+	// 				}else {
+	// 					res.json({
+	// 						message: 'Password not match'
+	// 					})
+	// 				}
+	// 			})
+	// 		}else {
+	// 			res.json({
+	// 				message: 'No User found'
+	// 			})
+	// 		}
+	// 	})
+	// }
 }
