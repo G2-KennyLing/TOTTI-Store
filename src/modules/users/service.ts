@@ -1,7 +1,6 @@
 
 import { IUser } from './model';
 import users from './schema';
-import tokens from '../tokens/schema';
 
 export default class UserService {
 	
@@ -16,6 +15,11 @@ export default class UserService {
 
 	public updateUser(userParams: IUser, callback: any) {
 		const query = { _id: userParams._id };
+		users.findOneAndUpdate(query, userParams, callback);
+	}
+
+	public updateToken(userParams: IUser, callback: any) {
+		const query = { email: userParams.email };
 		users.findOneAndUpdate(query, userParams, callback);
 	}
 	

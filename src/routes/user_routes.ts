@@ -7,11 +7,11 @@ export class UserRoutes {
 
 	public route(app: Application) {
 		
-		// app.post('/api/login', (req: Request, res: Response) => {
-		// 	this.userController.loginUser(req, res);
-		// });
+		app.post('/api/login', (req: Request, res: Response) => {
+			this.userController.loginUser(req, res);
+		});
 
-		app.post('/api/register', (req: Request, res: Response) => {
+		app.post('/auth/signup', (req: Request, res: Response) => {
 			this.userController.createUser(req, res);
 		});
 
@@ -23,21 +23,33 @@ export class UserRoutes {
 		// 	this.userController.createUser(req, res);
 		// });
 
-		app.get('/api/verify/:token', (req: Request, res: Response) =>{
+		app.get('/auth/verify/:token', (req: Request, res: Response) =>{
 			this.userController.verifyUser(req, res);
 		});
 
-		app.get('/api/user/:id', (req: Request, res: Response) => {
+		app.get('/auth/:id', (req: Request, res: Response) => {
 			this.userController.getUser(req, res);
 		});
 
-		app.put('/api/user/:id', (req: Request, res: Response) => {
+		app.put('/auth/:id', (req: Request, res: Response) => {
 			this.userController.updateUser(req, res);
 		});
 
-		app.delete('/api/user/:id', (req: Request, res: Response) => {
+		app.delete('/auth/:id', (req: Request, res: Response) => {
 			this.userController.deleteUser(req, res);
 		});
+
+		app.put('/forgot-password', (req: Request, res: Response) =>{
+			this.userController.forgotPassword(req, res);
+		})
+
+		app.get('/reset/:token',(req: Request, res: Response) => {
+			this.userController.resetPassword(req, res);
+		})
+
+		app.post('/reset/:token',(req: Request, res: Response) => {
+			this.userController.confirmPassword(req, res);
+		})
 		
 	}
 }

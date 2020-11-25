@@ -1,19 +1,26 @@
-import * as mongoose from '../../../node_modules/mongoose';
+import * as mongoose from 'mongoose';
 import { ModificationNote } from '../common/model';
 import joi = require("joi");
+import { date } from 'joi';
 
 const Schema = mongoose.Schema;
 
-const schema = new Schema({
+const User = new Schema({
 	name: {
 		type: {
 			firstName: String,
 			lastName: String,
-
 		}
 	},
 	email: String,
 	password: String,
+	resetPasswordToken:{ 
+		type: String,
+		default: ""
+	},
+	  resetPasswordExpires:
+	  { type: Date, 
+		default: Date.now() },
 	phoneNumber: String,
 	gender: String,
 	isVerified:{
@@ -27,4 +34,4 @@ const schema = new Schema({
 	modificationNotes: [ModificationNote]
 });
 
-export default mongoose.model('users', schema);
+export default mongoose.model('users', User);
