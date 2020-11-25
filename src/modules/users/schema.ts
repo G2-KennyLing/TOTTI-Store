@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 import { ModificationNote } from '../common/model';
 import joi = require("joi");
+import { date } from 'joi';
 
 const Schema = mongoose.Schema;
 
@@ -13,6 +14,13 @@ const User = new Schema({
 	},
 	email: String,
 	password: String,
+	resetPasswordToken:{ 
+		type: String,
+		default: ""
+	},
+	  resetPasswordExpires:
+	  { type: Date, 
+		default: Date.now() },
 	phoneNumber: String,
 	gender: String,
 	isVerified:{

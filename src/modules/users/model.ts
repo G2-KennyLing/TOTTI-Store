@@ -8,6 +8,8 @@ export interface IUser {
 	};
 	email: String;
 	password: String;
+	resetPasswordToken: String;
+	resetPasswordExpires: Date;
 	phoneNumber: String;
 	gender: String;
 	isVerified?: Boolean;
