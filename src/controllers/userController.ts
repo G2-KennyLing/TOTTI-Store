@@ -1,17 +1,13 @@
-import { Request, Response } from "express";
-import {
-  insufficientParameters,
-  mongoError,
-  successResponse,
-  failureResponse,
-} from "../modules/common/service";
-import { IUser } from "../modules/users/model";
-import { IToken } from "../modules/tokens/model";
-import UserService from "../modules/users/service";
-import TokenService from "../modules/tokens/service";
-import schema from "../modules/users/schema";
-import express = require("express");
-import bcrypt = require("bcrypt");
+import { Request, Response } from 'express';
+import { insufficientParameters, mongoError, successResponse, failureResponse } from '../modules/common/service';
+import { IUser } from '../modules/users/model';
+import { IToken } from '../modules/tokens/model';
+import UserService from '../modules/users/service';
+import TokenService from '../modules/tokens/service';
+import User from '../modules/users/schema';
+import express = require('express');
+import * as bcrypt from "bcrypt";
+import jwt = require('jsonwebtoken');
 
 const sgMail = require("@sendgrid/mail");
 const key =

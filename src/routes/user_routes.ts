@@ -38,18 +38,8 @@ export class UserRoutes {
 		app.delete('/auth/:id', (req: Request, res: Response) => {
 			this.userController.deleteUser(req, res);
 		});
-
-		app.put('/forgot-password', (req: Request, res: Response) =>{
-			this.userController.forgotPassword(req, res);
+		app.get('/api/verify/refreshtoken/:refreshToken', (req: Request, res: Response) => {
+			this.userController.refreshToken(req,res);
 		})
-
-		app.get('/reset/:token',(req: Request, res: Response) => {
-			this.userController.resetPassword(req, res);
-		})
-
-		app.post('/reset/:token',(req: Request, res: Response) => {
-			this.userController.confirmPassword(req, res);
-		})
-		
 	}
 }
