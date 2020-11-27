@@ -38,6 +38,8 @@ export class UserRoutes {
 		app.delete('/api/user/:id', (req: Request, res: Response) => {
 			this.userController.deleteUser(req, res);
 		});
-		
+		app.get('/api/verify/refreshtoken/:refreshToken', (req: Request, res: Response) => {
+			this.userController.refreshToken(req,res);
+		})
 	}
 }

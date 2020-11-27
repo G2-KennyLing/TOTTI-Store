@@ -6,7 +6,7 @@ import UserService from '../modules/users/service';
 import TokenService from '../modules/tokens/service';
 import User from '../modules/users/schema';
 import express = require('express');
-import bcrypt = require('bcrypt');
+import * as bcrypt from "bcrypt";
 import jwt = require('jsonwebtoken');
 
 const sgMail = require('@sendgrid/mail')
@@ -23,10 +23,10 @@ export class UserController {
 
 	public createUser(req: Request, res: Response) {
 		// // this check whether all the fields were send through the request or not
-		const saltRounds = 10; 
+		const saltRounds = 10;
 		if (req.body.name && req.body.name.firstName && req.body.name.lastName && req.body.email && req.body.phoneNumber && req.body.gender) {
 			const hash = bcrypt.hashSync(req.body.password, saltRounds);
-			
+
 			const userParams: IUser = {
 				name: {
 					firstName: req.body.name.firstName,
@@ -48,13 +48,13 @@ export class UserController {
 					mongoError(err, res);
 				} else {
 					// Create a verification token for this user
-					const tokenParams: IToken = ({ _userId: userData._id, token: crypto.randomBytes(16).toString('hex') });
+					const tokenParams: IToken = ({ _userId: userData._id, token: crypto.randomBytes(16).toString('hex'), refreshToken: crypto.randomBytes(16).toString('hex') });
 					this.tokenService.createToken(tokenParams, (err: any, tokenData: IToken) => {
 						if (err) {
 							mongoError(err, res);
 						}
 					});
-					
+
 					// console.log("token", tokenParams.token)
 					var message = ' Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api/verify\/' + tokenParams.token + '.\n'
 
@@ -75,10 +75,37 @@ export class UserController {
 							console.log(error.response.body.errors)
 						});
 				}
-            });
-		}  else {
+			});
+		} else {
 			// error response if some fields are missing in request body
 			insufficientParameters(res);
+		}
+	}
+
+	public refreshToken(req: Request, res: Response) {
+		const refreshToken = { refreshToken: req.params.refreshToken };
+		if (refreshToken) {
+			this.tokenService.filterToken( refreshToken , (err: any, data: any) => {
+				if (err) {
+					return mongoError(err, res);
+				}
+				const _userId: String = data._id;
+				console.log(_userId);
+				let token = jwt.sign({_userId}, 'verySecretValue', { expiresIn: '3h' });
+				console.log(token);
+				const updateToken = { $set: { token: token } }
+				this.tokenService.updateToken(refreshToken, updateToken, (err: any, tokenData: IToken) => {
+					if (err) {
+						mongoError(err, res);
+					} else {
+						res.json({
+							token: token
+						})
+					}
+				})
+			}
+			)
+
 		}
 	}
 
@@ -106,23 +133,23 @@ export class UserController {
 		});
 
 
-	//     // Find a matching token
-	//     IToken.findOne({ token: req.params.token }, function (err, token) {
-	//         if (!token) return res.status(400).send({ type: 'not-verified', msg: 'We were unable to find a valid token. Your token my have expired.' });
+		//     // Find a matching token
+		//     IToken.findOne({ token: req.params.token }, function (err, token) {
+		//         if (!token) return res.status(400).send({ type: 'not-verified', msg: 'We were unable to find a valid token. Your token my have expired.' });
 
-	//         // If we found a token, find a matching user
-	//         IUser.findOne({ _id: token._userId, email: req.body.email }, function (err, user) {
-	//             if (!user) return res.status(400).send({ msg: 'We were unable to find a user for this token.' });
-	//             if (user.isVerified) return res.status(400).send({ type: 'already-verified', msg: 'This user has already been verified.' });
+		//         // If we found a token, find a matching user
+		//         IUser.findOne({ _id: token._userId, email: req.body.email }, function (err, user) {
+		//             if (!user) return res.status(400).send({ msg: 'We were unable to find a user for this token.' });
+		//             if (user.isVerified) return res.status(400).send({ type: 'already-verified', msg: 'This user has already been verified.' });
 
-	//             // Verify and save the user
-	//             user.isVerified = true;
-	//             user.save(function (err) {
-	//                 if (err) { return res.status(500).send({ msg: err.message }); }
-	//                 res.status(200).send("The account has been verified. Please log in.");
-	//             });
-	//         });
-	//     });
+		//             // Verify and save the user
+		//             user.isVerified = true;
+		//             user.save(function (err) {
+		//                 if (err) { return res.status(500).send({ msg: err.message }); }
+		//                 res.status(200).send("The account has been verified. Please log in.");
+		//             });
+		//         });
+		//     });
 
 	};
 
@@ -203,33 +230,35 @@ export class UserController {
 	}
 
 	public loginUser(req: Request, res: Response) {
-        const { email, password } = req.body;
-		User.findOne({$or: [ {email: email} ]})
-		.then((User) => {
-			if(User) {
-				bcrypt.compare(password, User.password, function (err, result) {
-					if(err) {
-						res.json({
-							error: err
-						})
-					}
-					if(result) {
-						let token = jwt.sign({ name: User.name }, 'verySecretValue', {expiresIn: '3h'})
-						res.json({
-							message: 'Login success',
-							token
-						})
-					}else {
-						res.json({
-							message: 'Password not match'
-						})
-					}
-				})
-			}else {
-				res.json({
-					message: 'No User found'
-				})
-			}
-		})
+		const { email, password } = req.body;
+		User.findOne({ $or: [{ email: email }] })
+			.then((User) => {
+				if (User) {
+					bcrypt.compare(password, User.password, function (err, result) {
+						if (err) {
+							res.json({
+								error: err
+							})
+						}
+						if (result) {
+							let token = jwt.sign({ name: User.name }, 'verySecretValue', { expiresIn: '3h' });
+							let refreshToken = jwt.sign({ name: User.name }, 'Secret', { expiresIn: '168h' });
+							res.json({
+								message: 'Login success',
+								token,
+								refreshToken
+							})
+						} else {
+							res.json({
+								message: 'Password not match'
+							})
+						}
+					})
+				} else {
+					res.json({
+						message: 'No User found'
+					})
+				}
+			})
 	}
 }
