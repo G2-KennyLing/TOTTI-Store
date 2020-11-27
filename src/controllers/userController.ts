@@ -6,7 +6,7 @@ import UserService from '../modules/users/service';
 import TokenService from '../modules/tokens/service';
 import User from '../modules/users/schema';
 import express = require('express');
-import bcrypt = require('bcrypt');
+import * as bcrypt from "bcrypt";
 import jwt = require('jsonwebtoken');
 
 const sgMail = require('@sendgrid/mail')
@@ -23,11 +23,11 @@ export class UserController {
 
 	public createUser(req: Request, res: Response) {
 		// // this check whether all the fields were send through the request or not
-		const saltRounds = 10; 
+		const saltRounds = 10;
 		if (req.body.name && req.body.name.firstName && req.body.name.lastName && req.body.email && req.body.phoneNumber && req.body.gender) {
 
 			const hash = bcrypt.hashSync(req.body.password, saltRounds);
-			
+
 			const userParams: IUser = {
 				name: {
 					firstName: req.body.name.firstName,
@@ -51,13 +51,13 @@ export class UserController {
 					mongoError(err, res);
 				} else {
 					// Create a verification token for this user
-					const tokenParams: IToken = ({ _userId: userData._id, token: crypto.randomBytes(16).toString('hex') });
+					const tokenParams: IToken = ({ _userId: userData._id, token: crypto.randomBytes(16).toString('hex'), refreshToken: crypto.randomBytes(16).toString('hex') });
 					this.tokenService.createToken(tokenParams, (err: any, tokenData: IToken) => {
 						if (err) {
 							mongoError(err, res);
 						}
 					});
-					
+
 					// console.log("token", tokenParams.token)
 					var message = ' Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api/verify\/' + tokenParams.token + '.\n'
 
@@ -78,10 +78,37 @@ export class UserController {
 							console.log(error.response.body.errors)
 						});
 				}
-            });
-		}  else {
+			});
+		} else {
 			// error response if some fields are missing in request body
 			insufficientParameters(res);
+		}
+	}
+
+	public refreshToken(req: Request, res: Response) {
+		const refreshToken = { refreshToken: req.params.refreshToken };
+		if (refreshToken) {
+			this.tokenService.filterToken( refreshToken , (err: any, data: any) => {
+				if (err) {
+					return mongoError(err, res);
+				}
+				const _userId: String = data._id;
+				console.log(_userId);
+				let token = jwt.sign({_userId}, 'verySecretValue', { expiresIn: '3h' });
+				console.log(token);
+				const updateToken = { $set: { token: token } }
+				this.tokenService.updateToken(refreshToken, updateToken, (err: any, tokenData: IToken) => {
+					if (err) {
+						mongoError(err, res);
+					} else {
+						res.json({
+							token: token
+						})
+					}
+				})
+			}
+			)
+
 		}
 	}
 
