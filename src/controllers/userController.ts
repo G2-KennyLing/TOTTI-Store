@@ -25,6 +25,7 @@ export class UserController {
 		// // this check whether all the fields were send through the request or not
 		const saltRounds = 10;
 		if (req.body.name && req.body.name.firstName && req.body.name.lastName && req.body.email && req.body.phoneNumber && req.body.gender) {
+
 			const hash = bcrypt.hashSync(req.body.password, saltRounds);
 
 			const userParams: IUser = {
@@ -33,6 +34,8 @@ export class UserController {
 					lastName: req.body.name.lastName
 				},
 				email: req.body.email,
+				resetPasswordToken: req.body.resetPasswordToken,
+				resetPasswordExpires: req.body.resetPasswordExpires,
 				password: hash,
 				phoneNumber: req.body.phoneNumber,
 				gender: req.body.gender,
@@ -169,11 +172,7 @@ export class UserController {
 	}
 
 	public updateUser(req: Request, res: Response) {
-		if (req.params.id &&
-			req.body.name || req.body.name.firstName || req.body.name.lastName ||
-			req.body.email ||
-			req.body.phoneNumber ||
-			req.body.gender) {
+		if (req.params.id && req.body.name || req.body.name.firstName || req.body.name.lastName || req.body.email || req.body.phoneNumber || req.body.gender) {
 			const userFilter = { _id: req.params.id };
 			this.userService.filterUser(userFilter, (err: any, userData: IUser) => {
 				if (err) {
@@ -192,6 +191,8 @@ export class UserController {
 						} : userData.name,
 						email: req.body.email ? req.body.email : userData.email,
 						password: req.body.password ? req.body.password : userData.password,
+						resetPasswordToken: req.body.resetPasswordToken ? req.body.resetPasswordToken : userData.resetPasswordToken,
+						resetPasswordExpires: req.body.resetPasswordExpires ? req.body.resetPasswordExpires : userData.resetPasswordExpires,
 						phoneNumber: req.body.phoneNumber ? req.body.phoneNumber : userData.phoneNumber,
 						gender: req.body.gender ? req.body.gender : userData.gender,
 						isDeleted: req.body.isDeleted ? req.body.isDeleted : userData.isDeleted,
@@ -229,36 +230,150 @@ export class UserController {
 		}
 	}
 
-	public loginUser(req: Request, res: Response) {
-		const { email, password } = req.body;
-		User.findOne({ $or: [{ email: email }] })
-			.then((User) => {
-				if (User) {
-					bcrypt.compare(password, User.password, function (err, result) {
-						if (err) {
-							res.json({
-								error: err
-							})
-						}
-						if (result) {
-							let token = jwt.sign({ name: User.name }, 'verySecretValue', { expiresIn: '3h' });
-							let refreshToken = jwt.sign({ name: User.name }, 'Secret', { expiresIn: '168h' });
-							res.json({
-								message: 'Login success',
-								token,
-								refreshToken
-							})
-						} else {
-							res.json({
-								message: 'Password not match'
-							})
-						}
-					})
-				} else {
-					res.json({
-						message: 'No User found'
-					})
-				}
-			})
+	// public loginUser(req: Request, res: Response) {
+    //     const { email, password } = req.body;
+	// 	User.findOne({$or: [ {email: email} ]})
+	// 	.then((User) => {
+	// 		if(User) {
+	// 			bcrypt.compare(password, User.password, function (err, result) {
+	// 				if(err) {
+	// 					res.json({
+	// 						error: err
+	// 					})
+	// 				}
+	// 				if(result) {
+	// 					let token = jwt.sign({ name: User.name }, 'verySecretValue', {expiresIn: '3h'})
+	// 					res.json({
+	// 						message: 'Login success',
+	// 						token
+	// 					})
+	// 				}else {
+	// 					res.json({
+	// 						message: 'Password not match'
+	// 					})
+	// 				}
+	// 			})
+	// 		}else {
+	// 			res.json({
+	// 				message: 'No User found'
+	// 			})
+	// 		}
+	// 	})
+	// }
+
+	public forgotPassword(req: Request, res: Response) {
+
+		const userFilter = { email: req.body.email };
+		this.userService.filterUser(userFilter, (err: any, userData: IUser) => {
+			if (err) {
+				failureResponse('Email khong ton tai', userData, res)
+			} else if (userData) {
+				successResponse('Ton tai email',userData, res)
+				userData.modificationNotes.push({
+					modifiedOn: new Date(Date.now()),
+					modifiedBy: null,
+					modificationNote: 'User data updated'
+				});
+				const token = crypto.randomBytes(20).toString('hex');
+				const date = new Date(Date.now());
+				console.log(token, date);
+
+				const userParams: IUser = {
+					_id: req.params.id,
+					name: req.body.name ? {
+						firstName: req.body.name.firstName ? req.body.name.firstName : userData.name.firstName,
+						lastName: req.body.name.firstName ? req.body.name.lastName : userData.name.lastName
+					} : userData.name,
+					email: req.body.email ? req.body.email : userData.email,
+					password: req.body.password ? req.body.password : userData.password,
+					resetPasswordToken: token ? token : userData.resetPasswordToken,
+					resetPasswordExpires: date ? date : userData.resetPasswordExpires,
+					phoneNumber: req.body.phoneNumber ? req.body.phoneNumber : userData.phoneNumber,
+					gender: req.body.gender ? req.body.gender : userData.gender,
+					isDeleted: req.body.isDeleted ? req.body.isDeleted : userData.isDeleted,
+					modificationNotes: userData.modificationNotes
+				};
+				this.userService.updateToken(userParams, (err: any) => {
+					if (err) {
+						mongoError(err, res);
+					} else {
+						successResponse('Create reset token successfull', null, res);
+					}
+				});
+				// var messsage = 'Hello,\n\n' + 'Please change your password account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/forgot-password\/' + token + '.\n'
+
+				// const msg = {
+				// 	to: userData.email, // Change to your recipient
+				// 	from: 'vagabond2610@gmail.com', // Change to your verified sender
+				// 	subject: 'Confirm Account',
+				// 	text: 'Please change your password account!!!!',
+				// 	html: '<strong>Click here to change your password account</strong> ' + messsage,
+
+				// }
+
+				// sgMail
+				// 	.send(msg)
+				// 	.then(() => {
+				// 		successResponse('create user and token successfull', userData, res);
+
+				// 	})
+				// 	.catch((error) => {
+				// 		console.error(error)
+				// 		console.log(error.response.body.errors)
+				// 	});
+			}
+			else {
+				failureResponse('Invalid user', null, res);
+			}
+		});
+	}
+
+	public resetPassword(req: Request, res: Response) {
+		const userFilter = { resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } };
+		this.userService.filterUser(userFilter, (err: any, userData: IUser) => {
+			if (err) {
+				failureResponse('Password reset token is invalid or has expired.', err, null)
+			} else {
+				successResponse('Get user successfull', userData, res);
+			}
+		});
+	}
+
+	public confirmPassword(req: Request, res: Response) {
+		const userFilter = { resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } };
+		this.userService.filterUser(userFilter, (err: any, userData: IUser) => {
+			if (err) {
+				failureResponse('Password reset token is invalid or has expired.', err, null)
+			} else if (userData) {
+				userData.modificationNotes.push({
+					modifiedOn: new Date(Date.now()),
+					modifiedBy: null,
+					modificationNote: 'User data updated'
+				});
+				const userParams: IUser = {
+					_id: req.params.id,
+					name: req.body.name ? {
+						firstName: req.body.name.firstName ? req.body.name.firstName : userData.name.firstName,
+						lastName: req.body.name.firstName ? req.body.name.lastName : userData.name.lastName
+					} : userData.name,
+					email: req.body.email ? req.body.email : userData.email,
+					password: req.body.password ? req.body.password : userData.password,
+					resetPasswordToken: req.body.resetPasswordToken ? req.body.resetPasswordToken : userData.resetPasswordToken,
+					resetPasswordExpires: req.body.resetPasswordExpires ? req.body.resetPasswordExpires : userData.resetPasswordExpires,
+					phoneNumber: req.body.phoneNumber ? req.body.phoneNumber : userData.phoneNumber,
+					gender: req.body.gender ? req.body.gender : userData.gender,
+					isDeleted: req.body.isDeleted ? req.body.isDeleted : userData.isDeleted,
+					modificationNotes: userData.modificationNotes
+				};
+				this.userService.updateUser(userParams, (err: any) => {
+					if (err) {
+						mongoError(err, res);
+					} else {
+						successResponse('Change your password successfull', null, res);
+					}
+				});
+				
+			}
+		});
 	}
 }
