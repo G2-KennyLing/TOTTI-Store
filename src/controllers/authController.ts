@@ -77,7 +77,6 @@ export class AuthController {
               return res.status(200).json({
                 message: "Signup Successful",
                 newUser,
-                token,
               });
             })
             .catch((err) => {
@@ -87,4 +86,16 @@ export class AuthController {
       );
     });
   };
+  public signin(req: Request, res: Response): void {
+    const { email, password } = req.body;
+    this.userService.filterUser({email}, (err: any, userData: IUser) =>{
+      if(err){
+        return mongoError(err, res);
+      }
+      if(this.userService.comparePassword(userData,password))
+        return res.json({message: "thanh cong"})
+        return res.json({message: "that bai"})
+      
+    })
+  }
 }

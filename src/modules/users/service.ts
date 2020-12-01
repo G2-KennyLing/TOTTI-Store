@@ -6,7 +6,9 @@ export default class UserService {
     const _session = new users(userParams);
     _session.save(callback);
   }
-
+  public comparePassword(user: any,plainText:string):boolean{
+    return user.authenticate(plainText);
+  }
   public filterUser(query: any, callback: any) {
     users.findOne(query, callback);
   }

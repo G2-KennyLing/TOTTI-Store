@@ -10,5 +10,8 @@ export class AuthRoute {
         this.authController.signup(req, res, next);
       }
     );
+    app.post("/api/signin", (req: Request, res: Response)=>{
+      this.authController.signin(req,res);
+    })
   }
 }

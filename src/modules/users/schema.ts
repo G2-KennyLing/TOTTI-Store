@@ -61,7 +61,7 @@ User.virtual("password")
     return this.hashed_password;
   });
 
-User.methods = {
+User.method = {
   encryptPassword: function (password) {
     if (!password) return "";
     try {
