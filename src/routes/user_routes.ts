@@ -6,7 +6,7 @@ export class UserRoutes {
 	private userController: UserController = new UserController();
 
 	public route(app: Application) {
-		
+
 		app.post('/api/login', (req: Request, res: Response) => {
 			this.userController.loginUser(req, res);
 		});
@@ -18,10 +18,11 @@ export class UserRoutes {
 		// app.post('/api/auth/signup', (req: Request, res: Response) => {
 		// 	this.userController.createUser(req, res);
 		// });
-
 		// app.post('/api/auth/login', (req: Request, res: Response) => {
 		// 	this.userController.createUser(req, res);
 		// });
+
+		app.p
 
 		app.get('/auth/verify/:token', (req: Request, res: Response) =>{
 			this.userController.verifyUser(req, res);
