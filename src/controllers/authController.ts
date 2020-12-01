@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import {
   insufficientParameters,
   mongoError,
@@ -15,15 +15,10 @@ export class AuthController {
   private userService: UserService = new UserService();
 
   public signup = (req: Request, res: Response, next: NextFunction): void => {
-    const {
-      name: { firstName, lastName },
-      email,
-      password,
-      phoneNumber,
-      gender,
-    } = req.body;
+    const { name, email, password, phoneNumber, gender } = req.body;
+    const { firstName, lastName } = name || {};
     if (
-      !(firstName || lastName || email || password || phoneNumber || gender)
+      !(firstName && lastName && email && password && phoneNumber && gender)
     ) {
       return insufficientParameters(res);
     }
@@ -51,7 +46,7 @@ export class AuthController {
       const userId: String = newUser._id;
       jwt.sign(
         { userId },
-        process.env.JWT_ACCESS_TOKEN,
+        process.env.JWT_VERIFY_MAIL_TOKEN,
         {
           expiresIn: "10m",
         },
@@ -71,13 +66,13 @@ export class AuthController {
             },
           };
           newUser.hashed_password = undefined;
+          newUser.salt = undefined;
           sgMail
             .send(msg)
             .then(() => {
               return res.status(200).json({
                 message: "Signup Successful",
                 newUser,
-                token,
               });
             })
             .catch((err) => {
@@ -85,6 +80,78 @@ export class AuthController {
             });
         }
       );
+    });
+  };
+  public signin = (req: Request, res: Response) => {
+    const { email, password } = req.body;
+    if (!(email && password)) return insufficientParameters(res);
+    this.userService.filterUser({ email }, async (err: Error, user: IUser) => {
+      if (err) return mongoError(err, res);
+      //@ts-ignore
+      if (!user.authenticate(password))
+        return failureResponse("Email and Password is not match", {}, res);
+      const token = await jwt.sign({ user }, process.env.JWT_ACCESS_TOKEN, {
+        expiresIn: "1d",
+      });
+      const refreshToken = await jwt.sign(
+        { user },
+        process.env.JWT_REFRESH_TOKEN,
+        { expiresIn: "1m" }
+      );
+      user.hashed_password = undefined;
+      user.salt = undefined;
+      return res.status(200).json({
+        message: "Signin Successful",
+        token,
+        refreshToken,
+        user,
+      });
+    });
+  };
+  public requireSignin = (req: Request, res: Response, next: NextFunction) => {
+    if (!req.headers.authorization)
+      return res.status(401).json({
+        message: "Unauthorized, access denied",
+      });
+    const [bearer, token] = req.headers.authorization.split(" ");
+    if (!token)
+      return res.status(401).json({
+        message: "Unauthorized, access denied",
+      });
+    jwt.verify(token, process.env.JWT_ACCESS_TOKEN, (err, decoded) => {
+      if (err)
+        return res.status(400).json({
+          message: "token is not valid, access denied",
+        });
+      //@ts-ignore
+      req.user = decoded.user;
+      next();
+    });
+  };
+  public isVerified = (req: Request, res: Response, next: NextFunction) => {
+    //@ts-ignore
+    const isVerified = req.user && req.user.isVerified;
+    if (!isVerified)
+      return res.status(400).json({
+        message: "Verify required, access denied",
+      });
+    next();
+  };
+  public verifyEmail = (req: Request, res: Response) => {
+    const { token } = req.params;
+    jwt.verify(token, process.env.JWT_VERIFY_MAIL_TOKEN, (err, decoded) => {
+      if (err)
+        return res.status(400).json({
+          message: "token is not valid",
+        });
+      const { userId } = decoded;
+      this.userService.verifyUser(userId, (err, user) => {
+        if (err) return mongoError(err, res);
+        return res.status(200).json({
+          message: "Verify Successful",
+          user,
+        });
+      });
     });
   };
 }

@@ -10,7 +10,14 @@ export default class UserService {
   public filterUser(query: any, callback: any) {
     users.findOne(query, callback);
   }
-
+  public verifyUser(_id: string, callback) {
+    return users.findByIdAndUpdate(
+      _id,
+      { $set: { isVerified: true } },
+      { new: true },
+      callback
+    );
+  }
   public updateUser(userParams: IUser, callback: any) {
     const query = { _id: userParams._id };
     users.findOneAndUpdate(query, userParams, callback);
