@@ -59,6 +59,7 @@ export class UserController {
           const tokenParams: IToken = {
             _userId: userData._id,
             token: crypto.randomBytes(16).toString("hex"),
+            refreshToken: crypto.randomBytes(16).toString("hex"),
           };
           this.tokenService.createToken(
             tokenParams,
