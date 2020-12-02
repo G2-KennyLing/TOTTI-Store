@@ -53,6 +53,7 @@ export class AuthController {
         function (err, token) {
           if (err) return res.status(400).json({ err });
           const templateId: string = "d-9aa79e9a022b4f2687cb861c2626792a";
+          console.log(req.headers.host);
           const msg: sgMail.MailDataRequired = {
             to: <string>newUser.email, // Change to your recipient
             from: {
@@ -62,7 +63,7 @@ export class AuthController {
             subject: "Confirm Account",
             templateId,
             dynamicTemplateData: {
-              verifyLink: `http:\/\/${req.headers.host}\/api/verify\/${token}`,
+              verifyLink: `http:\/\/${req.headers.host}\/api/auth\/verify\/${token}`,
             },
           };
           newUser.hashed_password = undefined;
@@ -96,7 +97,7 @@ export class AuthController {
       const refreshToken = await jwt.sign(
         { user },
         process.env.JWT_REFRESH_TOKEN,
-        { expiresIn: "1m" }
+        { expiresIn: "7d" }
       );
       user.hashed_password = undefined;
       user.salt = undefined;

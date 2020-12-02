@@ -5,15 +5,15 @@ export class AuthRoute {
   private authController: AuthController = new AuthController();
   public route(app: Application) {
     app.post(
-      "/api/auth/signup",
+      "/auth/signup",
       (req: Request, res: Response, next: NextFunction) => {
         this.authController.signup(req, res, next);
       }
     );
-    app.post("/api/auth/signin", (req: Request, res: Response) => {
+    app.post("/auth/signin", (req: Request, res: Response) => {
       this.authController.signin(req, res);
     });
-    app.get("/api/auth/verify/:token", (req: Request, res: Response) => {
+    app.get("/auth/verify/:token", (req: Request, res: Response) => {
       this.authController.verifyEmail(req, res);
     });
     app.get(
