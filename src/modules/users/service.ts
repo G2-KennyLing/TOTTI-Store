@@ -11,7 +11,6 @@ export default class UserService {
     users.findOne(query, callback);
   }
   public verifyUser(_id: string, callback) {
-    
     return users.findByIdAndUpdate(
       _id,
       //@ts-ignore
