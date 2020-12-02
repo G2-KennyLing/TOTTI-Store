@@ -122,7 +122,7 @@ export class AuthController {
     jwt.verify(token, process.env.JWT_ACCESS_TOKEN, (err, decoded) => {
       if (err)
         return res.status(400).json({
-          message: "token is not valid, access denied",
+          message: "Token is not valid, access denied",
         });
       //@ts-ignore
       req.user = decoded.user;
