@@ -48,6 +48,7 @@ const User = new Schema({
       },
     ],
   },
+  //@ts-ignore
   modificationNotes: [ModificationNote],
 });
 
@@ -60,8 +61,8 @@ User.virtual("password")
   .get(function () {
     return this.hashed_password;
   });
-
-User.method = {
+//@ts-ignore
+User.methods = {
   encryptPassword: function (password) {
     if (!password) return "";
     try {
