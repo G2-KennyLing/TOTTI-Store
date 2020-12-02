@@ -16,6 +16,9 @@ export class AuthRoute {
     app.get("/auth/verify/:token", (req: Request, res: Response) => {
       this.authController.verifyEmail(req, res);
     });
+    app.post("/auth/refreshToken", (req: Request, res: Response) =>{
+      this.authController.refreshToken(req, res);
+    })
     app.get(
       "/test",
       this.authController.requireSignin,

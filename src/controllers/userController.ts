@@ -13,18 +13,66 @@ import User from "../modules/users/schema";
 import express = require("express");
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import sgMail = require("@sendgrid/mail");
 
-const sgMail = require("@sendgrid/mail");
-const key =
-  "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";
-// sgMail.setApiKey("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")
-sgMail.setApiKey(key);
+require("dotenv").config();
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 var crypto = require("crypto");
 var nodemailer = require("nodemailer");
 
 export class UserController {
   private userService: UserService = new UserService();
   private tokenService: TokenService = new TokenService();
+
+  public forgotPassword(req: Request, res: Response) {
+    const {email} = req.body;
+    if(!email) 
+    return insufficientParameters(res); 
+    this.userService.filterUser({email}, (err: any, userData: IUser) => {
+      if (err) {
+        return failureResponse("Email is not valid", userData, res);
+      } 
+      if (userData) {
+        successResponse("Email is valid", userData, res);
+        userData.modificationNotes.push({
+          modifiedOn: new Date(Date.now()),
+          modifiedBy: null,
+          modificationNote: "User data updated",
+        });
+        const userID = userData._id;
+        jwt.sign({userID}, process.env.JWT_FORGOTPASSWORD_TOKEN, {expiresIn: '10m'}, function(err, token){
+          if (err) return res.status(400).json({ err });
+          const templateId: string = "d-9aa79e9a022b4f2687cb861c2626792a";
+          const msg: sgMail.MailDataRequired = {
+            to: <string>userData.email, // Change to your recipient
+            from: {
+              name: "TOTTI STORE", //The display name
+              email: "linhqt1999@gmail.com", //sender
+            }, // Change to your verified sender
+            subject: "Confirm change your Password Account",
+            templateId,
+            dynamicTemplateData: {
+              verifyLink: `http:\/\/${req.headers.host}\/auth\/verify\/${token}`,
+            },
+          };
+          userData.hashed_password = undefined;
+          userData.salt = undefined;
+          sgMail
+            .send(msg)
+            .then(() => {
+              return res.status(200).json({
+                message: "Change Password Successful",
+                userData,
+              });
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        } )
+      }  
+       
+    });
+  }
 
   // public createUser(req: Request, res: Response) {
   //   // // this check whether all the fields were send through the request or not
@@ -277,80 +325,7 @@ export class UserController {
   // // 	})
   // // }
 
-  // public forgotPassword(req: Request, res: Response) {
-  //   const userFilter = { email: req.body.email };
-  //   this.userService.filterUser(userFilter, (err: any, userData: IUser) => {
-  //     if (err) {
-  //       failureResponse("Email khong ton tai", userData, res);
-  //     } else if (userData) {
-  //       successResponse("Ton tai email", userData, res);
-  //       userData.modificationNotes.push({
-  //         modifiedOn: new Date(Date.now()),
-  //         modifiedBy: null,
-  //         modificationNote: "User data updated",
-  //       });
-  //       const token = crypto.randomBytes(20).toString("hex");
-  //       const date = new Date(Date.now());
-  //       console.log(token, date);
-
-  //       const userParams: IUser = {
-  //         _id: req.params.id,
-  //         name: req.body.name
-  //           ? {
-  //               firstName: req.body.name.firstName
-  //                 ? req.body.name.firstName
-  //                 : userData.name.firstName,
-  //               lastName: req.body.name.firstName
-  //                 ? req.body.name.lastName
-  //                 : userData.name.lastName,
-  //             }
-  //           : userData.name,
-  //         email: req.body.email ? req.body.email : userData.email,
-  //         password: req.body.password ? req.body.password : userData.password,
-  //         resetPasswordToken: token ? token : userData.resetPasswordToken,
-  //         resetPasswordExpires: date ? date : userData.resetPasswordExpires,
-  //         phoneNumber: req.body.phoneNumber
-  //           ? req.body.phoneNumber
-  //           : userData.phoneNumber,
-  //         gender: req.body.gender ? req.body.gender : userData.gender,
-  //         isDeleted: req.body.isDeleted
-  //           ? req.body.isDeleted
-  //           : userData.isDeleted,
-  //         modificationNotes: userData.modificationNotes,
-  //       };
-  //       this.userService.updateToken(userParams, (err: any) => {
-  //         if (err) {
-  //           mongoError(err, res);
-  //         } else {
-  //           successResponse("Create reset token successfull", null, res);
-  //         }
-  //       });
-  // var messsage = 'Hello,\n\n' + 'Please change your password account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/forgot-password\/' + token + '.\n'
-
-  // const msg = {
-  // 	to: userData.email, // Change to your recipient
-  // 	from: 'vagabond2610@gmail.com', // Change to your verified sender
-  // 	subject: 'Confirm Account',
-  // 	text: 'Please change your password account!!!!',
-  // 	html: '<strong>Click here to change your password account</strong> ' + messsage,
-
-  // }
-
-  // sgMail
-  // 	.send(msg)
-  // 	.then(() => {
-  // 		successResponse('create user and token successfull', userData, res);
-
-  // 	})
-  // 	.catch((error) => {
-  // 		console.error(error)
-  // 		console.log(error.response.body.errors)
-  // 	});
-  //     } else {
-  //       failureResponse("Invalid user", null, res);
-  //     }
-  //   });
-  // }
+  
 
   public resetPassword(req: Request, res: Response) {
     const userFilter = {

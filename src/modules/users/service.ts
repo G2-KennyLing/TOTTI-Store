@@ -13,6 +13,7 @@ export default class UserService {
   public verifyUser(_id: string, callback) {
     return users.findByIdAndUpdate(
       _id,
+      //@ts-ignore
       { $set: { isVerified: true } },
       { new: true },
       callback
