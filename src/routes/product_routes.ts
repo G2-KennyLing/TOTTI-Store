@@ -10,7 +10,7 @@ export class ProductRoutes {
 			this.productController.getCategory(req, res);
         });
 
-        app.get('/chi-tiet/:id', (req: Request, res: Response) => {
+        app.get('/product/:id', (req: Request, res: Response) => {
 			this.productController.getProduct(req, res);
         });
         
