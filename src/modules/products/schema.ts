@@ -20,6 +20,7 @@ const Product = new Schema({
 	category_id: Number,
 	provider_id: Number,
 	store_id: Number,
+	//@ts-ignore
 	modificationNotes: [ModificationNote]
 });
 
