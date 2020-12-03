@@ -5,6 +5,7 @@ const tokenSchema = new mongoose.Schema({
 	_userId: String,
 	token: String,
 	refreshToken: String,
+	//@ts-ignore
 	createdAt: { type: Date, required: true, default: Date.now, expires: 43200 }
 });
 
