@@ -7,9 +7,9 @@ export class UserRoutes {
 
 	public route(app: Application) {
 
-		app.post('/api/login', (req: Request, res: Response) => {
-			this.userController.loginUser(req, res);
-		});
+		// app.post('/api/login', (req: Request, res: Response) => {
+		// 	this.userController.loginUser(req, res);
+		// });
 
 		app.post('/auth/signup', (req: Request, res: Response) => {
 			this.userController.createUser(req, res);
@@ -21,8 +21,6 @@ export class UserRoutes {
 		// app.post('/api/auth/login', (req: Request, res: Response) => {
 		// 	this.userController.createUser(req, res);
 		// });
-
-		app.p
 
 		app.get('/auth/verify/:token', (req: Request, res: Response) =>{
 			this.userController.verifyUser(req, res);

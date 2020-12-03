@@ -1,4 +1,3 @@
-
 import { IUser } from './model';
 import users from './schema';
 

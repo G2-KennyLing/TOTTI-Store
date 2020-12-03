@@ -1,18 +1,31 @@
 import { Application, Request, Response } from 'express';
-import { orderController } from '../controllers/orderController';
+import { OrderController } from '../controllers/orderController';
 
 export class OrderRoutes {
 
-	private  orderController: orderController = new orderController;
+	private orderController: OrderController = new OrderController();
 
 	public route(app: Application) {
 
-		app.post('/ordersList', (req: Request, res: Response) =>{
-			this.orderController.addOrder(req, res);
+		// app.get('/orders', (req: Request, res: Response) =>{
+		// 	// List orders
+		// 	this.orderController.getOrder(req, res);
+		// });
+
+		// app.post('/orders', (req: Request, res: Response) =>{
+		// 	// List orders
+		// 	this.orderController.postOrder(req, res);
+		// });
+
+		// app.get('/order/:id', (req: Request, res: Response) =>{
+		// 	// Detail order
+		// 	this.orderController.getFirstOrder(req, res);
+		// });
+
+		app.get('/orders', (req: Request, res: Response) =>{
+			// list order
+			this.orderController.getFirstOrder(req, res);
 		});
 
-		app.post('/ordersDetail', (req: Request, res: Response) =>{
-			this.orderController.addOrder(req, res);
-		});
 	}
 }
