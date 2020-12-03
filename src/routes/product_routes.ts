@@ -6,9 +6,18 @@ export class ProductRoutes {
 
     public route(app: Application){
 
+
+    // Noted: migration DB in nodejs with typescript.
+
         app.get('/category/:category_id', (req: Request, res: Response) => {
 			this.productController.getCategory(req, res);
         });
+
+        //Product_Type: {url}/product?Product_Type=aothun&Product_type=gom
+        //Product_Type: {url}/product
+        app.get('/product', (req: Request, res: Response) => {
+            this.productController.getAllProducts(req, res);
+        })
 
         app.get('/product/:id', (req: Request, res: Response) => {
 			this.productController.getProduct(req, res);

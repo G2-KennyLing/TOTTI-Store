@@ -7,6 +7,17 @@ export class ProductController{
 
     private productService: ProductService = new ProductService();
 
+    public getAllProducts(req: Request, res: Response) {
+      const productFilter = { };
+      this.productService.filterAllProduct(productFilter, (err: any, productData: IProduct) => {
+        if (err) {
+          mongoError(err, res);
+        } else {
+          successResponse("Get all product successful", productData, res);
+        }
+      });
+    }
+
     public getProduct(req: Request, res: Response){
         // if (req.params.id) {
             const productFilter = { _id: req.params.id };
