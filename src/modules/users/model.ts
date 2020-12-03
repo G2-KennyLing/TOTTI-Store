@@ -1,18 +1,24 @@
 import { ModificationNote } from "../common/model";
-
+enum role {
+  USER = 0,
+  EDITOR,
+  ADMIN,
+}
 export interface IUser {
-	_id?: String;
-	name: {
-		firstName: String;
-		lastName: String;
-	};
-	email: String;
-	password: String;
-	resetPasswordToken: String;
-	resetPasswordExpires: Date;
-	phoneNumber: String;
-	gender: String;
-	isVerified?: Boolean;
-	isDeleted?: Boolean;
-	modificationNotes: ModificationNote[]
+  _id?: String;
+  name: {
+    firstName: String;
+    lastName: String;
+  };
+  cart?: any[];
+  email: String;
+  password: String;
+  hashed_password?: String;
+  salt?: String;
+  phoneNumber: String;
+  gender: Boolean;
+  role?: role;
+  isVerified?: Boolean;
+  isDeleted?: Boolean;
+  modificationNotes: ModificationNote[]
 }

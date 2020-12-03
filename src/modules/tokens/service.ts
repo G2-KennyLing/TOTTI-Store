@@ -12,5 +12,7 @@ export default class TokenService {
 	public filterToken(query: any, callback: any) {
 		tokens.findOne(query, callback);
 	}
-
+	public updateToken(queryFilter: any, queryUpdate: any ,callback: any){
+		tokens.updateOne(queryFilter, queryUpdate, callback);
+	}
 }
