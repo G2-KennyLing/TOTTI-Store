@@ -1,7 +1,7 @@
 import * as mongoose from "mongoose";
 import { ModificationNote } from "../common/model";
-import { v1 as uuid } from "uuid";
 import * as crypto from "crypto";
+import * as bcrypt from "bcrypt";
 const Schema = mongoose.Schema;
 
 const User = new Schema({
@@ -33,7 +33,7 @@ const User = new Schema({
     type: Boolean,
     default: false,
   },
-  salt: String,
+  salt: Number,
   role: {
     type: Number,
     enum: [0, 1, 2],
@@ -55,8 +55,8 @@ const User = new Schema({
 User.virtual("password")
   .set(function (password) {
     this._password = password;
-    this.salt = uuid();
-    this.hashed_password = this.encryptPassword(password);
+    this.salt = 10;
+    this.hashed_password = bcrypt.hashSync(password, this.salt);
   })
   .get(function () {
     return this.hashed_password;
