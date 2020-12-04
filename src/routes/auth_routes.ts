@@ -18,7 +18,8 @@ export class AuthRoute {
     });
     app.post("/auth/refreshToken", (req: Request, res: Response) =>{
       this.authController.refreshToken(req, res);
-    })
+    });
+    
     app.get(
       "/test",
       this.authController.requireSignin,

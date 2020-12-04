@@ -6,43 +6,37 @@ import {
   failureResponse,
 } from "../modules/common/service";
 import { IUser } from "../modules/users/model";
-import { IToken } from "../modules/tokens/model";
 import UserService from "../modules/users/service";
-import TokenService from "../modules/tokens/service";
 import User from "../modules/users/schema";
 import express = require("express");
-import * as bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt = require("jsonwebtoken");
 import sgMail = require("@sendgrid/mail");
 
 require("dotenv").config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-var crypto = require("crypto");
-var nodemailer = require("nodemailer");
+
 
 export class UserController {
   private userService: UserService = new UserService();
-  private tokenService: TokenService = new TokenService();
 
   public forgotPassword(req: Request, res: Response) {
     const {email} = req.body;
     if(!email) 
-    return insufficientParameters(res); 
+      return insufficientParameters(res); 
+      console.log(this);
     this.userService.filterUser({email}, (err: any, userData: IUser) => {
       if (err) {
         return failureResponse("Email is not valid", userData, res);
       } 
       if (userData) {
-        successResponse("Email is valid", userData, res);
         userData.modificationNotes.push({
           modifiedOn: new Date(Date.now()),
           modifiedBy: null,
           modificationNote: "User data updated",
         });
-        const userID = userData._id;
-        jwt.sign({userID}, process.env.JWT_FORGOTPASSWORD_TOKEN, {expiresIn: '10m'}, function(err, token){
+        jwt.sign({user:userData}, process.env.JWT_FORGOTPASSWORD_TOKEN, {expiresIn: '10m'}, function(err, token){
           if (err) return res.status(400).json({ err });
-          const templateId: string = "d-9aa79e9a022b4f2687cb861c2626792a";
+          const templateId: string = "d-72351aceab0c401c958e9713bd97d56e";
           const msg: sgMail.MailDataRequired = {
             to: <string>userData.email, // Change to your recipient
             from: {
@@ -52,7 +46,7 @@ export class UserController {
             subject: "Confirm change your Password Account",
             templateId,
             dynamicTemplateData: {
-              verifyLink: `http:\/\/${req.headers.host}\/auth\/verify\/${token}`,
+              forgotPasswordLink: `http:\/\/${req.headers.host}\/auth\/resetPassword\/${token}`,
             },
           };
           userData.hashed_password = undefined;
@@ -61,8 +55,7 @@ export class UserController {
             .send(msg)
             .then(() => {
               return res.status(200).json({
-                message: "Change Password Successful",
-                userData,
+                message: "Send Reset Password Request  Successful",
               });
             })
             .catch((err) => {
@@ -73,7 +66,28 @@ export class UserController {
        
     });
   }
-
+  public resetPassword(req: Request, res: Response) {
+    const {newPasword,token} = req.body;
+    jwt.verify(token, process.env.JWT_FORGOTPASSWORD_TOKEN, (err, decoded) => {
+      if (err) {
+        return res.status(400).json({
+          message: "forgot password is not valid",
+        });
+      }
+      const user = decoded.user;
+      user.password = newPasword
+      this.userService.updateUser(user,(err: Error,userData: IUser) =>{
+        if(err){
+          return mongoError(err, res);
+        }
+        return res.status(200).json({
+          message: 'change password successful',
+          userData
+        })
+      })
+    })
+  }
+  
   // public createUser(req: Request, res: Response) {
   //   // // this check whether all the fields were send through the request or not
   //   if (
@@ -327,23 +341,7 @@ export class UserController {
 
   
 
-  public resetPassword(req: Request, res: Response) {
-    const userFilter = {
-      resetPasswordToken: req.params.token,
-      resetPasswordExpires: { $gt: Date.now() },
-    };
-    this.userService.filterUser(userFilter, (err: any, userData: IUser) => {
-      if (err) {
-        failureResponse(
-          "Password reset token is invalid or has expired.",
-          err,
-          null
-        );
-      } else {
-        successResponse("Get user successfull", userData, res);
-      }
-    });
-  }
+  
 
   //   public confirmPassword(req: Request, res: Response) {
   //     const userFilter = {
