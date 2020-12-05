@@ -1,6 +1,5 @@
 import * as mongoose from "mongoose";
 import { ModificationNote } from "../common/model";
-import { v1 as uuid } from "uuid";
 import * as crypto from "crypto";
 const Schema = mongoose.Schema;
 
@@ -55,7 +54,7 @@ const User = new Schema({
 User.virtual("password")
   .set(function (password) {
     this._password = password;
-    this.salt = uuid();
+    this.salt = crypto.randomBytes(16).toString("hex");
     this.hashed_password = this.encryptPassword(password);
   })
   .get(function () {

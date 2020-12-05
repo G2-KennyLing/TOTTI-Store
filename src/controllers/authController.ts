@@ -104,6 +104,10 @@ export class AuthController {
       );
       user.hashed_password = undefined;
       user.salt = undefined;
+      res.cookie("t", token, { expires: (new Date() as any) + 3600000 * 24 });
+      res.cookie("rt", refreshToken, {
+        expires: (new Date() as any) + 3600000 * 24 * 7,
+      });
       return res.status(200).json({
         message: "Signin Successful",
         token,
@@ -163,37 +167,37 @@ export class AuthController {
     const isAdmin = req.user.role == 2;
     if (!isAdmin) {
       return res.status(400).json({
-        message: "You are not Admin, access denied"
+        message: "You are not Admin, access denied",
       });
     }
     next();
-  }
+  };
   public isEditor = (req: Request, res: Response, next: NextFunction) => {
     //@ts-ignore
     const isEditor = req.user.role == 1;
     if (isEditor) {
       return res.status(400).json({
-        message: "You are not Editor, access denied"
+        message: "You are not Editor, access denied",
       });
     }
     next();
-  }
+  };
   public refreshToken(req: Request, res: Response) {
-    const  {refreshToken}  = req.body;
-    if(!refreshToken)
-    return insufficientParameters(res);
-      jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN, (err, decoded) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken) return insufficientParameters(res);
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN, (err, decoded) => {
       if (err) {
         return res.status(400).json({
           message: "refresh token is not valid",
         });
       }
-      console.log(decoded);
       const user = decoded.user;
-      const token =  jwt.sign({ user }, process.env.JWT_ACCESS_TOKEN, { expiresIn: '1d' });
-      return res.status(200).json({
-        token
+      const token = jwt.sign({ user }, process.env.JWT_ACCESS_TOKEN, {
+        expiresIn: "1d",
       });
-    })
+      return res.status(200).json({
+        token,
+      });
+    });
   }
 }
