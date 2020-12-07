@@ -17,14 +17,12 @@ export class OrderRoutes {
 		// 	this.orderController.postOrder(req, res);
 		// });
 
-		// app.get('/order/:id', (req: Request, res: Response) =>{
-		// 	// Detail order
+		// app.get('/orders', (req: Request, res: Response) =>{
 		// 	this.orderController.getFirstOrder(req, res);
 		// });
 
 		app.get('/orders', (req: Request, res: Response) =>{
-			// list order
-			this.orderController.getFirstOrder(req, res);
+			this.orderController.getAllOrders(req, res);
 		});
 
 	}

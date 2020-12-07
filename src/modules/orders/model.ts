@@ -1,6 +1,6 @@
 import { ModificationNote } from "../common/model";
 
-export interface order {
+export interface IOrder {
 	_id?: String;
 	customer_id: Number;
 	status: String;
@@ -8,7 +8,10 @@ export interface order {
 	discount_code: String;
 	store_id: Number;
 	staff_id: Number;
-	order_items: [{
-		product_id: Number;
-	}]
+	order_items: {
+		type: {
+			product_id: String;
+			ref: "products"
+		}
+	}
 }

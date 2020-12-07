@@ -1,10 +1,9 @@
-import { order } from './model';
+import { IOrder } from './model';
 import orders from './schema';
 
-export default class UserService {
+export default class OrderService {
 
-	public getFirstOrder(query: any, callback: any) {
-		orders.findOne(query, callback);
+	public filterAllOrder(query: any, callback: any) {
+		orders.find(query, callback);
 	}
-
 }

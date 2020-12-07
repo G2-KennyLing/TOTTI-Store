@@ -10,11 +10,15 @@ const Orders = new Schema({
 	order_date: Date,
 	ship_date: Date,
 	discount_code: String,
-	store_id : Number,
+	store_id: Number,
 	staff_id: Number,
-	order_items: [{
-		product_id : Number
-	}]
+	order_items: {
+		type: {
+			product_id: String,
+			ref: "products"
+		}
+	},
+	modificationNote: [ModificationNote]
 });
 
 export default mongoose.model('orders', Orders)
