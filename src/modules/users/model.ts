@@ -14,7 +14,7 @@ export interface IUser {
   email: String;
   password: String;
   hashed_password?: String;
-  salt?: String;
+  salt?: Number;
   phoneNumber: String;
   gender: Boolean;
   role?: role;
