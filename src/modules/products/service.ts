@@ -14,4 +14,10 @@ export default class ProductService{
 	public filterAllProduct(query: any, callback: any) {
 		products.find(query, callback);
 	}
+
+	public filterAllProductByCategory(query: any, callback: any) {
+		products.find(query, callback);
+	}
+
+
 }

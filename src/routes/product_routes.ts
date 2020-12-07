@@ -18,7 +18,11 @@ export class ProductRoutes {
         app.get('/product', (req: Request, res: Response) => {
             this.productController.getAllProducts(req, res);
         })
-
+        
+        app.get('/category', (req: Request, res: Response) => {
+            this.productController.getProductByCategoryType(req, res);
+        })
+        
         app.get('/product/:id', (req: Request, res: Response) => {
 			this.productController.getProduct(req, res);
         });

@@ -44,4 +44,15 @@ export class ProductController{
         });
     }
 
+    public getProductByCategoryType(req: Request, res: Response){
+      const productFilter = { category_id : {$in :[ req.query.category , req.query.category1 ]}};
+      this.productService.filterAllProductByCategory(productFilter, (err: any, productData: IProduct) => {
+        if (err) {
+          mongoError(err, res);
+        } else {
+          successResponse("Get product category successful", productData, res);
+        }
+      });
+  }
+
 }
