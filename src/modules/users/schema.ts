@@ -33,7 +33,7 @@ const User = new Schema({
     type: Boolean,
     default: false,
   },
-  salt: Number,
+  salt: String,
   role: {
     type: Number,
     enum: [0, 1, 2],
@@ -55,7 +55,7 @@ const User = new Schema({
 User.virtual("password")
   .set(function (password) {
     this._password = password;
-    this.salt = 10;
+    this.salt = bcrypt.genSaltSync(10);
     this.hashed_password = bcrypt.hashSync(password, this.salt);
   })
   .get(function () {
@@ -66,16 +66,17 @@ User.methods = {
   encryptPassword: function (password) {
     if (!password) return "";
     try {
-      return crypto
-        .createHmac("sha1", this.salt)
-        .update(password)
-        .digest("hex");
+      // return crypto
+      //   .createHmac("sha1", this.salt)
+      //   .update(password)
+      //   .digest("hex");
+      return bcrypt.compareSync(password, this.hashed_password)
     } catch (err) {
       return "";
     }
   },
   authenticate: function (plainText) {
-    return this.encryptPassword(plainText) === this.hashed_password;
+    return bcrypt.compareSync(plainText, this.hashed_password);
   },
 };
 
