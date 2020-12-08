@@ -11,7 +11,11 @@ export class ProductRoutes {
 
         app.get('/category/:category_id', (req: Request, res: Response) => {
 			this.productController.getCategory(req, res);
-        });
+        })
+
+        app.post('/product', (req: Request, res: Response) => {
+            this.productController.createProduct(req, res);
+        })
 
         //Product_Type: {url}/product?Product_Type=aothun&Product_type=gom
         //Product_Type: {url}/product
