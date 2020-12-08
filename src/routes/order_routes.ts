@@ -21,7 +21,7 @@ export class OrderRoutes {
 		// 	this.orderController.getFirstOrder(req, res);
 		// });
 
-		app.get('/orders', (req: Request, res: Response) =>{
+		app.get('/orders/:id', (req: Request, res: Response) =>{
 			this.orderController.getAllOrders(req, res);
 		});
 

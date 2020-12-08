@@ -8,7 +8,7 @@ export class OrderController {
 	private ordersService: OrderService = new OrderService();
 
 	public getAllOrders(req: Request, res: Response) {
-		const orderFilter = { };
+		const orderFilter = { _id: req.params.id };
 		this.ordersService.filterAllOrder(orderFilter, (err: any, orderData: IOrder) => {
 			if (err) {
 				mongoError(err, res);
@@ -16,7 +16,6 @@ export class OrderController {
 				successResponse("Get all orders successful", orderData, res);
 			  }
 		});
-		
 	}
 
 }

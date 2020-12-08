@@ -6,6 +6,7 @@ import environment from "../environment";
 import { UserRoutes } from "../routes/user_routes";
 import { CommonRoutes } from "../routes/common_routes";
 import { ProductRoutes } from "../routes/product_routes";
+import { OrderRoutes } from "../routes/order_routes";
 
 class App {
 
@@ -16,15 +17,18 @@ class App {
   private common_routes: CommonRoutes = new CommonRoutes();
   private auth_route: AuthRoute = new AuthRoute();
   private product_routes: ProductRoutes = new ProductRoutes();
+  private order_routes: OrderRoutes = new OrderRoutes();
   constructor() {
     this.app = express();
     this.config();
 
     this.mongoSetup();
     this.auth_route.route(this.app);
+    this.order_routes.route(this.app);
     this.product_routes.route(this.app);
     this.test_routes.route(this.app);
     this.common_routes.route(this.app);
+
   }
 
   private config(): void {
