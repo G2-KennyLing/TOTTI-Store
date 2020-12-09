@@ -12,9 +12,8 @@ export interface IProduct {
 	size: String,
 	color: String,
 	product_image: { 
-		type:{
 			link: String
-	}},
+	},
 	category_id: Number,
 	provider_id: Number,
 	store_id: Number,
