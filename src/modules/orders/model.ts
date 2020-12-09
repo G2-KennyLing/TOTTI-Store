@@ -11,7 +11,7 @@ export interface IOrder {
 	order_items: {
 		type: {
 			product_id: String;
-			ref: "products"
+			// ref: "products"
 		}
 	}
 }

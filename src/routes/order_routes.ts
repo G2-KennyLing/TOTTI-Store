@@ -7,21 +7,15 @@ export class OrderRoutes {
 
 	public route(app: Application) {
 
-		// app.get('/orders', (req: Request, res: Response) =>{
-		// 	// List orders
-		// 	this.orderController.getOrder(req, res);
-		// });
-
-		// app.post('/orders', (req: Request, res: Response) =>{
-		// 	// List orders
-		// 	this.orderController.postOrder(req, res);
-		// });
-
-		// app.get('/orders', (req: Request, res: Response) =>{
-		// 	this.orderController.getFirstOrder(req, res);
-		// });
+		app.post('/orders/create', (req: Request, res: Response) =>{
+			this.orderController.createdOrder(req, res);
+		});
 
 		app.get('/orders/:id', (req: Request, res: Response) =>{
+			this.orderController.getAnOrders(req, res);
+		});
+
+		app.get('/orders', (req: Request, res: Response) =>{
 			this.orderController.getAllOrders(req, res);
 		});
 
