@@ -19,6 +19,9 @@ export class AuthRoute {
     app.post("/auth/refreshToken", (req: Request, res: Response) =>{
       this.authController.refreshToken(req, res);
     });
+    app.get("/auth/signout", (req: Request, res: Response) =>{
+      this.authController.Signout(req, res);
+    })
     
     app.get(
       "/test",
