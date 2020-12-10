@@ -31,7 +31,7 @@ export class OrderController {
 
 	public createdOrder(req: Request, res: Response) {
 		if ( req.body.customer_id && req.body.status && req.body.order_date && req.body.discount_code 
-			&& req.body.store_id && req.body.staff_id && req.body.order_items.product_id ) {
+			&& req.body.store_id && req.body.staff_id ) {
 			const orderParams: IOrder = {
 				customer_id: req.body.customer_id,
 				status: req.body.status,
@@ -40,8 +40,8 @@ export class OrderController {
 				store_id: req.body.store_id,
 				staff_id: req.body.staff_id,
 				order_items:{
-					product_id: req.body.order_items.product_id
-				}
+					product_id: req.body.product_id
+				},
 			}
 		this.ordersService.createOrder(orderParams, (err: any, orderData: IOrder) => {
 			if (err) {

@@ -12,12 +12,7 @@ const Orders = new Schema({
 	discount_code: String,
 	store_id: Number,
 	staff_id: Number,
-	order_items: {
-		type: {
-			product_id: String,
-			ref: "products"
-		}
-	},
+	order_items: [{ type: Schema.Types.product_id, ref: "products" }],
 	modificationNote: [ModificationNote]
 });
 
