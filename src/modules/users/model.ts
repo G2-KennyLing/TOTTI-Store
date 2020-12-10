@@ -20,5 +20,5 @@ export interface IUser {
   role?: role;
   isVerified?: Boolean;
   isDeleted?: Boolean;
-  modificationNotes: ModificationNote[]
+  modificationNotes: ModificationNote[];
 }
