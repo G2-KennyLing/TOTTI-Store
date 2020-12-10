@@ -1,7 +1,8 @@
+import { NextFunction } from 'express';
 import * as mongoose from "mongoose";
 import { ModificationNote } from "../common/model";
-import { v1 as uuid } from "uuid";
 import * as crypto from "crypto";
+import bcrypt = require('bcrypt')
 const Schema = mongoose.Schema;
 
 const User = new Schema({
@@ -33,7 +34,6 @@ const User = new Schema({
     type: Boolean,
     default: false,
   },
-  salt: String,
   role: {
     type: Number,
     enum: [0, 1, 2],
@@ -55,7 +55,7 @@ const User = new Schema({
 User.virtual("password")
   .set(function (password) {
     this._password = password;
-    this.salt = uuid();
+    this.salt = 10;
     this.hashed_password = this.encryptPassword(password);
   })
   .get(function () {
@@ -63,16 +63,25 @@ User.virtual("password")
   });
 //@ts-ignore
 User.methods = {
-  encryptPassword: function (password) {
+  encryptPassword: function (password,next: NextFunction) {
     if (!password) return "";
-    try {
-      return crypto
-        .createHmac("sha1", this.salt)
-        .update(password)
-        .digest("hex");
-    } catch (err) {
-      return "";
-    }
+    bcrypt.genSalt(saltRounds, (err, salt) => {
+      if(err) {
+        return next(err);   
+      }
+
+      bcrypt.hash(user.password, salt, function(err, hash) {
+        if(err) {
+            return next(err);
+        }
+        user.password = hash;
+        next()
+      });
+    })  
+  }
+  else {
+    next()
+  }
   },
   authenticate: function (plainText) {
     return this.encryptPassword(plainText) === this.hashed_password;
