@@ -18,6 +18,7 @@ const User = new Schema({
     trim: true,
     required: true,
     unique: true,
+    lowercase: true
   },
   hashed_password: {
     type: String,
