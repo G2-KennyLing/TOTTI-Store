@@ -14,11 +14,11 @@ export interface IUser {
   email: String;
   password: String;
   hashed_password?: String;
-  salt?: Number;
+  salt?: String;
   phoneNumber: String;
   gender: Boolean;
   role?: role;
   isVerified?: Boolean;
   isDeleted?: Boolean;
-  modificationNotes: ModificationNote[]
+  modificationNotes: ModificationNote[];
 }

@@ -8,6 +8,9 @@ import { CommonRoutes } from "../routes/common_routes";
 import { ProductRoutes } from "../routes/product_routes";
 import { OrderRoutes } from "../routes/order_routes";
 
+import * as cors from "cors";
+import * as cookieParser from "cookie-parser";
+
 class App {
 
   public app: express.Application;
@@ -37,6 +40,9 @@ class App {
     require("dotenv").config();
     //support application/x-www-form-urlencoded post data
     this.app.use(bodyParser.urlencoded({ extended: false }));
+
+    this.app.use(cors());
+    this.app.use(cookieParser());
   }
 
   private mongoSetup(): void {
