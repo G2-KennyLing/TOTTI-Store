@@ -43,38 +43,40 @@ export class AuthController {
           },
         ],
       };
-      const handleCreate = new Promise(async (resolve, reject) => {
-        await this.userService.createUser(
-          userParams,
-          (err: any, newUser: IUser) => {
+      const userEmail = new Promise(async (resolve, reject) => {
+        await this.userService.filterUser(
+          { email },
+          (err: any, user: IUser) => {
             if (err) {
-              // return mongoError(err, res);
               return reject(err);
             }
-            return resolve(newUser._id);
+            return resolve(user);
           }
         );
       })
         .then((rs) => rs)
         .catch((err) => err);
-      const userId = await handleCreate;
+      const user = await userEmail;
+      if (user)
+        return res.status(400).json({
+          message: "Email already signup",
+        });
       const token = await jwt.sign(
-        { userId },
+        { user: userParams },
         process.env.JWT_VERIFY_MAIL_TOKEN,
         {
           expiresIn: "10m",
         }
       );
       let verifyLink = `http:\/\/${req.headers.host}\/auth\/verify\/${token}`;
-      const sendMail = this.mailer.sendMail({
+      this.mailer.sendMail({
         from: "TOTTI STORE",
         to: email,
         subject: "VERIFY EMAIL",
         html: this.mailer.verifyEmailTemplate(verifyLink),
       });
       return res.status(200).json({
-        message: "Signup Successful",
-        data: sendMail,
+        message: `Signup Successful, Email has been send to ${email}`,
       });
     } catch (error) {
       res.status(500).json({
@@ -101,7 +103,6 @@ export class AuthController {
         { expiresIn: "7d" }
       );
       user.hashed_password = undefined;
-      user.salt = undefined;
       res.cookie("token", token, {
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
       });
@@ -136,27 +137,19 @@ export class AuthController {
       next();
     });
   };
-  public isVerified = (req: Request, res: Response, next: NextFunction) => {
-    //@ts-ignore
-    const isVerified = req.user && req.user.isVerified;
-    if (!isVerified)
-      return res.status(400).json({
-        message: "Verify required, access denied",
-      });
-    next();
-  };
-  public verifyEmail = (req: Request, res: Response) => {
+  public verifyEmail = async (req: Request, res: Response) => {
     const { token } = req.params;
     jwt.verify(token, process.env.JWT_VERIFY_MAIL_TOKEN, (err, decoded) => {
       if (err)
         return res.status(400).json({
           message: "token is not valid",
         });
-      const { userId } = decoded;
-      this.userService.verifyUser(userId, (err, user) => {
+      const { user } = decoded;
+      this.userService.createUser(user, (err, user) => {
         if (err) return mongoError(err, res);
+        user.hashed_password = undefined;
         return res.status(200).json({
-          message: "Verify Successful",
+          message: "Create user successful",
           user,
         });
       });
