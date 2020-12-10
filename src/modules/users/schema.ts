@@ -1,3 +1,4 @@
+import { NextFunction } from "express";
 import * as mongoose from "mongoose";
 import { ModificationNote } from "../common/model";
 import * as crypto from "crypto";
@@ -34,7 +35,6 @@ const User = new Schema({
     type: Boolean,
     default: false,
   },
-  salt: String,
   role: {
     type: Number,
     enum: [0, 1, 2],
@@ -64,14 +64,14 @@ User.virtual("password")
   });
 //@ts-ignore
 User.methods = {
-  encryptPassword: function (password) {
+  encryptPassword: function (password, next: NextFunction) {
     if (!password) return "";
     try {
       // return crypto
       //   .createHmac("sha1", this.salt)
       //   .update(password)
       //   .digest("hex");
-      return bcrypt.compareSync(password, this.hashed_password)
+      return bcrypt.compareSync(password, this.hashed_password);
     } catch (err) {
       return "";
     }
