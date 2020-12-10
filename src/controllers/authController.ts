@@ -10,7 +10,7 @@ import sgMail = require("@sendgrid/mail");
 import UserService from "../modules/users/service";
 import TokenService from "../modules/tokens/service";
 import jwt = require("jsonwebtoken");
-import { IToken } from "modules/tokens/model";
+
 require("dotenv").config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 export class AuthController {
@@ -92,8 +92,9 @@ export class AuthController {
     this.userService.filterUser({ email }, async (err: Error, user: IUser) => {
       if (err) return mongoError(err, res);
       //@ts-ignore
-      if (!user.authenticate(password))
+      if (!user.authenticate(password)){
         return failureResponse("Email and Password is not match", {}, res);
+      }
       const token = await jwt.sign({ user }, process.env.JWT_ACCESS_TOKEN, {
         expiresIn: "1d",
       });
@@ -104,6 +105,12 @@ export class AuthController {
       );
       user.hashed_password = undefined;
       user.salt = undefined;
+      res.cookie('token', token, {
+        expires: new Date(Date.now() + 600000)
+      });
+      res.cookie('refreshToken', refreshToken, {
+        expires: new Date(Date.now() + 604800000)
+      });
       return res.status(200).json({
         message: "Signin Successful",
         token,
@@ -113,11 +120,11 @@ export class AuthController {
     });
   };
   public requireSignin = (req: Request, res: Response, next: NextFunction) => {
-    if (!req.headers.authorization)
+    const token = req.cookies.token;
+    if (!req.cookies)
       return res.status(401).json({
         message: "Unauthorized, access denied",
       });
-    const [bearer, token] = req.headers.authorization.split(" ");
     if (!token)
       return res.status(401).json({
         message: "Unauthorized, access denied",
@@ -179,21 +186,30 @@ export class AuthController {
     next();
   }
   public refreshToken(req: Request, res: Response) {
-    const  {refreshToken}  = req.body;
-    if(!refreshToken)
-    return insufficientParameters(res);
-      jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN, (err, decoded) => {
+    const  refreshToken  = req.cookies.refreshToken;
+    if (!refreshToken)
+      return insufficientParameters(res);
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN, (err, decoded) => {
       if (err) {
         return res.status(400).json({
           message: "refresh token is not valid",
         });
       }
-      console.log(decoded);
       const user = decoded.user;
-      const token =  jwt.sign({ user }, process.env.JWT_ACCESS_TOKEN, { expiresIn: '1d' });
-      return res.status(200).json({
-        token
+      const token = jwt.sign({ user }, process.env.JWT_ACCESS_TOKEN, { expiresIn: '1d' });
+      res.cookie('token', token, {
+        expires: new Date(Date.now() + 600000)
       });
+      return res.status(200).json({
+        message: "refresh token success"
+      });
+    })
+  }
+  public Signout(req: Request, res: Response){
+    res.clearCookie("token");
+    res.clearCookie("refreshToken");
+    res.status(200).json({
+      message: "Signout success"
     })
   }
 }

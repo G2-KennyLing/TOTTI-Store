@@ -1,8 +1,8 @@
-import { NextFunction } from 'express';
+import { NextFunction } from "express";
 import * as mongoose from "mongoose";
 import { ModificationNote } from "../common/model";
 import * as crypto from "crypto";
-import bcrypt = require('bcrypt')
+import * as bcrypt from "bcrypt";
 const Schema = mongoose.Schema;
 
 const User = new Schema({
@@ -55,36 +55,28 @@ const User = new Schema({
 User.virtual("password")
   .set(function (password) {
     this._password = password;
-    this.salt = 10;
-    this.hashed_password = this.encryptPassword(password);
+    this.salt = bcrypt.genSaltSync(10);
+    this.hashed_password = bcrypt.hashSync(password, this.salt);
   })
   .get(function () {
     return this.hashed_password;
   });
 //@ts-ignore
 User.methods = {
-  encryptPassword: function (password,next: NextFunction) {
+  encryptPassword: function (password, next: NextFunction) {
     if (!password) return "";
-    bcrypt.genSalt(saltRounds, (err, salt) => {
-      if(err) {
-        return next(err);   
-      }
-
-      bcrypt.hash(user.password, salt, function(err, hash) {
-        if(err) {
-            return next(err);
-        }
-        user.password = hash;
-        next()
-      });
-    })  
-  }
-  else {
-    next()
-  }
+    try {
+      // return crypto
+      //   .createHmac("sha1", this.salt)
+      //   .update(password)
+      //   .digest("hex");
+      return bcrypt.compareSync(password, this.hashed_password);
+    } catch (err) {
+      return "";
+    }
   },
   authenticate: function (plainText) {
-    return this.encryptPassword(plainText) === this.hashed_password;
+    return bcrypt.compareSync(plainText, this.hashed_password);
   },
 };
 
