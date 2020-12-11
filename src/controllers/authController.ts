@@ -137,30 +137,30 @@ export class AuthController {
     });
   };
   public isVerified = (req: Request, res: Response, next: NextFunction) => {
-    //@ts-ignore
-    const isVerified = req.user && req.user.isVerified;
-    if (!isVerified)
-      return res.status(400).json({
-        message: "Verify required, access denied",
-      });
-    next();
+	//@ts-ignore
+	const isVerified = req.user && req.user.isVerified;
+	if (!isVerified)
+	  return res.status(400).json({
+		message: "Verify required, access denied",
+	  });
+	next();
   };
   public verifyEmail = (req: Request, res: Response) => {
-    const { token } = req.params;
-    jwt.verify(token, process.env.JWT_VERIFY_MAIL_TOKEN, (err, decoded) => {
-      if (err)
-        return res.status(400).json({
-          message: "token is not valid",
-        });
-      const { userId } = decoded;
-      this.userService.verifyUser(userId, (err, user) => {
-        if (err) return mongoError(err, res);
-        return res.status(200).json({
-          message: "Verify Successful",
-          user,
-        });
-      });
-    });
+	const { token } = req.params;
+	jwt.verify(token, process.env.JWT_VERIFY_MAIL_TOKEN, (err, decoded) => {
+	  if (err)
+		return res.status(400).json({
+		  message: "token is not valid",
+		});
+	  const { userId } = decoded;
+	  this.userService.verifyUser(userId, (err, user) => {
+		if (err) return mongoError(err, res);
+		return res.status(200).json({
+		  message: "Verify Successful",
+		  user,
+		});
+	  });
+	});
   };
   public isAdmin = (req: Request, res: Response, next: NextFunction) => {
     //@ts-ignore
