@@ -177,7 +177,7 @@ export default class Nodemailer {
                                         </td>
                                     </tr>
                                     
-                                    <td style = "display: flex;justify-content: center;">
+                                    <td style = "display: flex;justify-content: center;padding:20px;">
                                         <p style="font-family: Helvetica, Arial, sans-serif;color: #666666">For any reason this button doesn't work, please follow this url <a href = "${verifyLink}">${verifyLink}</a></p>
                                     </td>
                                 </table>
