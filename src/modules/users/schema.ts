@@ -17,9 +17,9 @@ const User = new Schema({
   email: {
     type: String,
     trim: true,
+    lowercase: true,
     required: true,
     unique: true,
-    lowercase: true
   },
   hashed_password: {
     type: String,
@@ -27,10 +27,6 @@ const User = new Schema({
   },
   phoneNumber: String,
   gender: Boolean,
-  isVerified: {
-    type: Boolean,
-    default: false,
-  },
   isDeleted: {
     type: Boolean,
     default: false,
