@@ -8,8 +8,10 @@ interface Message {
   html: string;
 }
 const account = {
-  user: "getthem.ecommerce@gmail.com",
-  pass: "thiet1999",
+//   user: "getthem.ecommerce@gmail.com",
+    user: "contact@tottistore.com",
+    pass: "thiet1999",
+
 };
 export default class Nodemailer {
   public async sendMail(msg: Message) {
