@@ -8,8 +8,8 @@ interface Message {
   html: string;
 }
 const account = {
-  user: "getthem.ecommerce@gmail.com",
-  pass: "thiet1999",
+  user: "mai.travan@gmail.com",
+  pass: "http://tottistore.com",
 };
 export default class Nodemailer {
   public async sendMail(msg: Message) {
@@ -23,6 +23,7 @@ export default class Nodemailer {
         pass: account.pass, // generated ethereal password
       },
     });
+    msg.from = `TOTTI STORE <mai.vantran@gmail.com>`;
     let info = await transporter.sendMail(msg);
     return info;
   }

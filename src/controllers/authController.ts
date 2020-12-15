@@ -151,7 +151,10 @@ export class AuthController {
         });
       const { user } = decoded;
       this.userService.createUser(user, (err, user) => {
-        if (err) return mongoError(err, res);
+        if (err)
+          return res.status(400).json({
+            message: "Email has been verified",
+          });
         user.hashed_password = undefined;
         return res.status(200).json({
           message: "Create user successful",
