@@ -31,7 +31,7 @@ export class AuthRoute {
       this.authController.signOut(req, res);
     });
 
-    app.get("/test",
+    app.get("/auth/test",
       this.authController.isSignIn,
       (req: Request, res: Response) => {
         //@ts-ignore
