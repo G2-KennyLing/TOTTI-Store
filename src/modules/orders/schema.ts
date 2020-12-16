@@ -1,6 +1,6 @@
-import { date } from 'joi';
-import * as mongoose from 'mongoose';
-import { ModificationNote } from '../common/model';
+import { date } from "joi";
+import * as mongoose from "mongoose";
+import { ModificationNote } from "../common/model";
 
 const Schema = mongoose.Schema;
 interface order_item {
@@ -37,4 +37,4 @@ const Orders = new Schema({
 	modificationNote: [ModificationNote]
 });
 
-export default mongoose.model('orders', Orders)
+export default mongoose.model("orders", Orders);
