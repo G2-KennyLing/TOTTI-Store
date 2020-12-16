@@ -10,16 +10,33 @@ const Orders = new Schema({
   order_date: Date,
   shipping_address: String,
   billing_address: String,
-  payment_method: {
+  phone_number: {
     type: String,
-    enum: ["Paypal", "VNPay", "Visa"],
-    required: true,
+  },
+  payment_method: {
+    type: Number,
+    enum: [0, 1],
+    default: 0,
+  },
+  payment: {
+    type: Object,
+    default: {},
   },
   ship_date: Date,
   discount_code: String,
   store_id: String,
   staff_id: String,
-  order_items: [{ type: Schema.Types.ObjectId, ref: "products" }],
+  order_items: {
+    type: [
+      {
+        product_id: { type: Schema.Types.ObjectId, ref: "products" },
+        quantity: {
+          type: Number,
+          default: 1,
+        },
+      },
+    ],
+  },
   //@ts-ignore
   modificationNote: [ModificationNote],
 });

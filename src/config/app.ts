@@ -12,9 +12,9 @@ import * as cors from "cors";
 import * as cookieParser from "cookie-parser";
 
 class App {
-
   public app: express.Application;
-  public mongoUrl: string = "mongodb://localhost:27017/" + environment.getDBName();
+  public mongoUrl: string =
+    "mongodb://localhost:27017/" + environment.getDBName();
 
   private test_routes: UserRoutes = new UserRoutes();
   private common_routes: CommonRoutes = new CommonRoutes();
@@ -31,7 +31,6 @@ class App {
     this.product_routes.route(this.app);
     this.test_routes.route(this.app);
     this.common_routes.route(this.app);
-
   }
 
   private config(): void {
@@ -42,6 +41,7 @@ class App {
     this.app.use(bodyParser.urlencoded({ extended: false }));
 
     this.app.use(cors());
+    this.app.use(express.json());
     this.app.use(cookieParser());
   }
 
@@ -61,6 +61,5 @@ class App {
         process.exit();
       });
   }
-
 }
 export default new App().app;
