@@ -10,11 +10,6 @@ import UserService from "../modules/users/service";
 import jwt = require("jsonwebtoken");
 import Nodemailer from "../helpers/sendgird";
 require("dotenv").config();
-<<<<<<< HEAD
-=======
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
->>>>>>> develop
 export class AuthController {
   private userService: UserService = new UserService();
   public mailer: Nodemailer = new Nodemailer();
@@ -151,14 +146,10 @@ export class AuthController {
         });
       const { user } = decoded;
       this.userService.createUser(user, (err, user) => {
-<<<<<<< HEAD
-        if (err) return mongoError(err, res);
-=======
         if (err)
           return res.status(400).json({
             message: "Email has been verified",
           });
->>>>>>> 30961cf1fb0d84c049f202403666d370ea2ee273
         user.hashed_password = undefined;
         return res.status(200).json({
           message: "Create user successful",

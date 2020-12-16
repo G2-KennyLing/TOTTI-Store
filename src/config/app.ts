@@ -1,4 +1,3 @@
-
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as mongoose from "mongoose";
@@ -28,20 +27,12 @@ class App {
     this.app = express();
     this.config();
     this.mongoSetup();
-<<<<<<< HEAD
-    this.auth_route.route(this.app);
-    this.order_routes.route(this.app);
-    this.product_routes.route(this.app);
-    this.test_routes.route(this.app);
-    this.common_routes.route(this.app);
-=======
 
     this.auth.route(this.app);
     this.product.route(this.app);
     this.user.route(this.app);
     this.common.route(this.app);
     this.order.route(this.app);
->>>>>>> develop
   }
 
   private config(): void {
