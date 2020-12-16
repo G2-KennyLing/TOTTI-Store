@@ -10,10 +10,16 @@ import UserService from "../modules/users/service";
 import jwt = require("jsonwebtoken");
 import Nodemailer from "../helpers/sendgird";
 require("dotenv").config();
+<<<<<<< HEAD
+=======
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+>>>>>>> develop
 export class AuthController {
   private userService: UserService = new UserService();
   public mailer: Nodemailer = new Nodemailer();
-  public signup = async (req: Request, res: Response, next: NextFunction) => {
+
+  public signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { name, email, password, phoneNumber, gender } = req.body;
       const { firstName, lastName } = name || {};
@@ -81,7 +87,8 @@ export class AuthController {
       });
     }
   };
-  public signin = (req: Request, res: Response) => {
+
+  public signIn = (req: Request, res: Response) => {
     const { email, password } = req.body;
     if (!(email && password)) return insufficientParameters(res);
     this.userService.filterUser({ email }, async (err: Error, user: IUser) => {
@@ -113,7 +120,8 @@ export class AuthController {
       });
     });
   };
-  public requireSignin = (req: Request, res: Response, next: NextFunction) => {
+
+  public isSignIn = (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies.token;
     if (!req.cookies)
       return res.status(401).json({
@@ -133,6 +141,7 @@ export class AuthController {
       next();
     });
   };
+
   public verifyEmail = async (req: Request, res: Response) => {
     const { token } = req.params;
     jwt.verify(token, process.env.JWT_VERIFY_MAIL_TOKEN, (err, decoded) => {
@@ -142,10 +151,14 @@ export class AuthController {
         });
       const { user } = decoded;
       this.userService.createUser(user, (err, user) => {
+<<<<<<< HEAD
+        if (err) return mongoError(err, res);
+=======
         if (err)
           return res.status(400).json({
             message: "Email has been verified",
           });
+>>>>>>> 30961cf1fb0d84c049f202403666d370ea2ee273
         user.hashed_password = undefined;
         return res.status(200).json({
           message: "Create user successful",
@@ -154,6 +167,7 @@ export class AuthController {
       });
     });
   };
+
   public isAdmin = (req: Request, res: Response, next: NextFunction) => {
     //@ts-ignore
     const isAdmin = req.user.role == 2;
@@ -164,6 +178,7 @@ export class AuthController {
     }
     next();
   };
+
   public isEditor = (req: Request, res: Response, next: NextFunction) => {
     //@ts-ignore
     const isEditor = req.user.role == 1;
@@ -174,6 +189,7 @@ export class AuthController {
     }
     next();
   };
+
   public refreshToken(req: Request, res: Response) {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) return insufficientParameters(res);
@@ -195,7 +211,8 @@ export class AuthController {
       });
     });
   }
-  public Signout(req: Request, res: Response) {
+
+  public signOut(req: Request, res: Response) {
     res.clearCookie("token");
     res.clearCookie("refreshToken");
     res.status(200).json({
