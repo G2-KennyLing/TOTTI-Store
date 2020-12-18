@@ -6,6 +6,8 @@ import environment from "../environment";
 import { UserRoutes } from "../routes/user_routes";
 import { CommonRoutes } from "../routes/common_routes";
 import { ProductRoutes } from "../routes/product_routes";
+var session = require("express-session");
+let MongoStore = require('connect-mongo')(session);
 
 class App {
 
@@ -33,7 +35,20 @@ class App {
     require("dotenv").config();
     //support application/x-www-form-urlencoded post data
     this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.app.use(session(
+      {
+        secret: "test",
+        resave: false,//we are telling store not to open any new connection but use existing connection instead
+        saveUninitialized: false,
+        store: new MongoStore({ mongooseConnection: mongoose.connection }),
+        cookie: { maxAge: 180 * 60 * 1000 }//min sec milisec cookie how much long is session
+      }))
+      this.app.use((req,res,next)=>{
+        res.locals.session = req.session
+        next();
+       });
   }
+
 
   private mongoSetup(): void {
     mongoose
