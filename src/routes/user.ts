@@ -20,7 +20,7 @@ export class UserRoutes {
     app.get("/user/getUser/:id", (req: Request, res: Response) => {
       this.userController.getUser(req, res);
     });
-    
+
     app.delete("/user/deleteUser/:id", (req: Request, res: Response) => {
       this.userController.deleteUser(req, res);
     });
