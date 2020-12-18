@@ -8,14 +8,12 @@ import {
 import { IUser } from "../modules/users/model";
 import sgMail = require("@sendgrid/mail");
 import UserService from "../modules/users/service";
-import TokenService from "../modules/tokens/service";
 import jwt = require("jsonwebtoken");
 import Nodemailer from "../helpers/sendgird";
 require("dotenv").config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 export class AuthController {
   private userService: UserService = new UserService();
-  private tokenService: TokenService = new TokenService();
   public mailer: Nodemailer = new Nodemailer();
   public signup = async (req: Request, res: Response, next: NextFunction) => {
     try {
