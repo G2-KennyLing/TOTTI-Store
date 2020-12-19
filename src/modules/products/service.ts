@@ -1,7 +1,7 @@
 import { IProduct } from './model';
 import products from './schema';
 
-export default class ProductService{
+export default class ProductService {
 
 	public createProduct(productParams: IProduct, callback: any) {
 		const _session = new products(productParams);
