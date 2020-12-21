@@ -210,13 +210,11 @@ export class OrderController {
       const orderParams: IOrder = {
         customer_id: req.body.customer_id,
         status: req.body.status,
+        // name
         order_date: req.body.order_date,
         discount_code: req.body.discount_code,
-        billing_address: req.body.billing_address,
-        shipping_address: req.body.shipping_address,
+        address: req.body.address,
         phone_number: req.body.phone_number,
-        store_id: req.body.store_id,
-        staff_id: req.body.staff_id,
         payment_method: req.body.payment_method,
         order_items: req.body.order_items,
       };
