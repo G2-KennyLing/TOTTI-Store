@@ -3,7 +3,6 @@ export interface ModificationNote {
 	modifiedBy: String;
 	modificationNote: String;
 }
-
 export const ModificationNote = {
 	modifiedOn: Date,
 	modifiedBy: String,
