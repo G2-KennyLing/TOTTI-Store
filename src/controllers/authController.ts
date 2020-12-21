@@ -205,7 +205,27 @@ export class AuthController {
       });
     });
   }
-
+  public async adminLogin(req: Request, res: Response) {
+    const { email, password } = req.body;
+    const user = this.userService.filterUser({ email }, (err, user) => {
+      if (err) return mongoError(err, res);
+      if (!user)
+        return res.status(400).json({
+          message: "Email is not exists",
+        });
+      if (!user.authenticate(password))
+        return res.status(400).json({
+          message: "Email and password are not match",
+        });
+      if (user.role != 2)
+        return res.status(400).json({
+          message: "Admin required",
+        });
+      return res.status(200).json({
+        message: "Signin successful",
+      });
+    });
+  }
   public signOut(req: Request, res: Response) {
     res.clearCookie("token");
     res.clearCookie("refreshToken");
