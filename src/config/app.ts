@@ -6,7 +6,7 @@ import environment from "../environment";
 import { AuthRoute } from "../routes/auth";
 import { UserRoutes } from "../routes/user";
 import { ProductRoutes } from "../routes/product";
-import { OrderRoutes } from "../routes/order_routes";
+import { OrderRoutes } from "../routes/order";
 import { CommonRoutes } from "../routes/common";
 
 import * as cors from "cors";
