@@ -6,17 +6,13 @@ import {
   failureResponse,
 } from "../modules/common/service";
 import { IUser } from "../modules/users/model";
-import sgMail = require("@sendgrid/mail");
 import UserService from "../modules/users/service";
-import TokenService from "../modules/tokens/service";
 import jwt = require("jsonwebtoken");
-import Nodemailer from "../helpers/sendgird";
+import Nodemailer from "../helpers/verifyEmail";
 require("dotenv").config();
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export class AuthController {
   private userService: UserService = new UserService();
-  private tokenService: TokenService = new TokenService();
   public mailer: Nodemailer = new Nodemailer();
 
   public signUp = async (req: Request, res: Response, next: NextFunction) => {
@@ -144,21 +140,29 @@ export class AuthController {
 
   public verifyEmail = async (req: Request, res: Response) => {
     const { token } = req.params;
-    jwt.verify(token, process.env.JWT_VERIFY_MAIL_TOKEN, (err, decoded) => {
-      if (err)
-        return res.status(400).json({
-          message: "token is not valid",
+    jwt.verify(
+      token,
+      process.env.JWT_VERIFY_MAIL_TOKEN,
+      (err, decoded: any) => {
+        if (err)
+          return res.status(400).json({
+            message: "token is not valid",
+          });
+        //@ts-ignore
+        const { user } = decoded;
+        this.userService.createUser(user, (err, user) => {
+          if (err)
+            return res.status(400).json({
+              message: "Email has been verified",
+            });
+          user.hashed_password = undefined;
+          return res.status(200).json({
+            message: "Create user successful",
+            user,
+          });
         });
-      const { user } = decoded;
-      this.userService.createUser(user, (err, user) => {
-        if (err) return mongoError(err, res);
-        user.hashed_password = undefined;
-        return res.status(200).json({
-          message: "Create user successful",
-          user,
-        });
-      });
-    });
+      }
+    );
   };
 
   public isAdmin = (req: Request, res: Response, next: NextFunction) => {
@@ -204,7 +208,27 @@ export class AuthController {
       });
     });
   }
-
+  public async adminLogin(req: Request, res: Response) {
+    const { email, password } = req.body;
+    const user = this.userService.filterUser({ email }, (err, user) => {
+      if (err) return mongoError(err, res);
+      if (!user)
+        return res.status(400).json({
+          message: "Email is not exists",
+        });
+      if (!user.authenticate(password))
+        return res.status(400).json({
+          message: "Email and password are not match",
+        });
+      if (user.role != 2)
+        return res.status(400).json({
+          message: "Admin required",
+        });
+      return res.status(200).json({
+        message: "Signin successful",
+      });
+    });
+  }
   public signOut(req: Request, res: Response) {
     res.clearCookie("token");
     res.clearCookie("refreshToken");

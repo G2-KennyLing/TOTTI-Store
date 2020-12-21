@@ -9,12 +9,8 @@ import { IUser } from "../modules/users/model";
 import UserService from "../modules/users/service";
 import express = require("express");
 import jwt = require("jsonwebtoken");
-import sgMail = require("@sendgrid/mail");
-import { resolve } from "path";
-import Nodemailer from "../helpers/sendgird";
-
+import Nodemailer from "../helpers/verifyEmail";
 require("dotenv").config();
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export class UserController {
   private userService: UserService = new UserService();

@@ -8,8 +8,8 @@ interface Message {
   html: string;
 }
 const account = {
-  user: "getthem.ecommerce@gmail.com",
-  pass: "thiet1999",
+  user: "mai.travan@gmail.com",
+  pass: "http://tottistore.com",
 };
 export default class Nodemailer {
   public async sendMail(msg: Message) {
@@ -23,6 +23,7 @@ export default class Nodemailer {
         pass: account.pass, // generated ethereal password
       },
     });
+    msg.from = `Totti Store <mai.vantran@gmail.com>`;
     let info = await transporter.sendMail(msg);
     return info;
   }
@@ -31,7 +32,7 @@ export default class Nodemailer {
     <html>
     
     <head>
-        <title></title>
+        <title>Totti Store</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -170,16 +171,17 @@ export default class Nodemailer {
                                         <td bgcolor="#ffffff" align="center" style="padding: 20px 30px 60px 30px;">
                                             <table border="0" cellspacing="0" cellpadding="0">
                                                 <tr>
-                                                    <td align="center" style="border-radius: 3px;" bgcolor="#FFA73B"><a href="${verifyLink}" target="_blank" style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #fff; text-decoration: none; text-decoration: none; padding: 15px 25px; border-radius: 2px; display: inline-block;background: #B6EB7A">Confirm Account</a></td>
+                                                    <td align="center">
+                                                        <a href="${verifyLink}" target="_blank" style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #fff; text-decoration: none; text-decoration: none; padding: 15px 25px; border-radius: 2px; display: inline-block;background: #B6EB7A">Confirm Account</a>
+                                                    </td>
+                                                    <td style = "display: flex;justify-content: center;padding:20px;">
+                                                        <p style="font-size: 20px; font-family: Helvetica, Arial, sans-serif; color: #666666">or 
+                                                        <a style="color: #B6EB7A;" href="">Visit our store</a></p>
+                                                    </td>
                                                 </tr>
-                                                
                                             </table>
                                         </td>
                                     </tr>
-                                    
-                                    <td style = "display: flex;justify-content: center;padding:20px;">
-                                        <p style="font-family: Helvetica, Arial, sans-serif;color: #666666">For any reason this button doesn't work, please follow this url <a href = "${verifyLink}">${verifyLink}</a></p>
-                                    </td>
                                 </table>
                             </td>
                             
@@ -252,15 +254,9 @@ export default class Nodemailer {
                                             target="_blank"
                                                 style="background:#B6EB7A;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">Reset
                                                 Password</a>
-                                                <p style="color:#455056;padding: 10px; font-size:15px;line-height:24px; margin:0;">
-                                                If this button doesn't work for any reason, please follow this url:
-                                                <a href = "${link}" target = "_blank">${link}</a>
-                                            </p>
                                         </td>
-                                        
                                     </tr>
                                     <tr>
-                                    
                                         <td style="height:40px;">&nbsp;</td>
                                     </tr>
                                 </table>

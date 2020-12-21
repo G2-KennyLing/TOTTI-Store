@@ -1,4 +1,3 @@
-
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as mongoose from "mongoose";
@@ -16,9 +15,9 @@ import * as cors from "cors";
 import * as cookieParser from "cookie-parser";
 
 class App {
-
   public app: express.Application;
-  public mongoUrl: string = "mongodb://localhost:27017/" + environment.getDBName();
+  public mongoUrl: string =
+    "mongodb://localhost:27017/" + environment.getDBName();
 
   private auth: AuthRoute = new AuthRoute();
   private user: UserRoutes = new UserRoutes();
@@ -47,6 +46,7 @@ class App {
     require("dotenv").config();
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(cors());
+    this.app.use(express.json());
     this.app.use(cookieParser());
   }
 
@@ -66,7 +66,6 @@ class App {
         process.exit();
       });
   }
-
 }
 
 export default new App().app;
