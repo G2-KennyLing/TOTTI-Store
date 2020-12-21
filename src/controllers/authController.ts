@@ -140,24 +140,29 @@ export class AuthController {
 
   public verifyEmail = async (req: Request, res: Response) => {
     const { token } = req.params;
-    jwt.verify(token, process.env.JWT_VERIFY_MAIL_TOKEN, (err, decoded) => {
-      if (err)
-        return res.status(400).json({
-          message: "token is not valid",
-        });
-      const { user } = decoded;
-      this.userService.createUser(user, (err, user) => {
+    jwt.verify(
+      token,
+      process.env.JWT_VERIFY_MAIL_TOKEN,
+      (err, decoded: any) => {
         if (err)
           return res.status(400).json({
-            message: "Email has been verified",
+            message: "token is not valid",
           });
-        user.hashed_password = undefined;
-        return res.status(200).json({
-          message: "Create user successful",
-          user,
+        //@ts-ignore
+        const { user } = decoded;
+        this.userService.createUser(user, (err, user) => {
+          if (err)
+            return res.status(400).json({
+              message: "Email has been verified",
+            });
+          user.hashed_password = undefined;
+          return res.status(200).json({
+            message: "Create user successful",
+            user,
+          });
         });
-      });
-    });
+      }
+    );
   };
 
   public isAdmin = (req: Request, res: Response, next: NextFunction) => {
