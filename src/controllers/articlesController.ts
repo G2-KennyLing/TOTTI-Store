@@ -13,7 +13,7 @@ export class ArticlesController {
 			author: req.body.author
 		});
 		article.save();
-		res.send("created success");
+		res.send("Created articles success");
 	}
 
 	public updateArticles(req: Request, res: Response, next) {
@@ -25,7 +25,7 @@ export class ArticlesController {
 	public deleteArticles(req: Request, res: Response, next) {
 		articles.deleteOne({ _id: req.params.id }, req.body)
 		.then(() => res.json({
-			mess : "deleted success"
+			mess : "Deleted articles success"
 		}))
 		.catch(next);
 	}

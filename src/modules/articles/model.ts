@@ -1,14 +1,16 @@
 import { ModificationNote } from "../common/model";
 
 enum articlesStatus {
-	PENDING, UNAPPROVE, APPROVE
+	PENDING, DRAFT, PUBLIC
 }
 
 export interface Iarticles {
 	_id?: String,
-	heading: String,
-	content: String,
+	name: String,
+	discription: String,
+	summary: String,
+	body: String,
 	image: String,
-	author: String,
+	user_id: String,
 	status?: articlesStatus
 }

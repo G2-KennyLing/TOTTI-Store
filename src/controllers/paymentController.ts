@@ -1,7 +1,5 @@
 import { Response, Request } from 'express';
 import { insufficientParameters, mongoError, successResponse, failureResponse } from '../modules/common/service';
-import { requestIp  } from 'request-ip';
-// import { io } from 'socket.io';
 
 export class PaymentController {
 	public createPayment(req: Request, res: Response) {
