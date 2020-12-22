@@ -9,6 +9,8 @@ import { ProductRoutes } from "../routes/product";
 import { OrderRoutes } from "../routes/order";
 import { DiscountRouter } from '../routes/discount';
 import { StoreRouter } from "../routes/store";
+import { PaymentRouters } from "../routes/payment";
+import { ArticlesRouters } from "../routes/articles";
 import { CommonRoutes } from "../routes/common";
 
 
@@ -27,6 +29,8 @@ class App {
   private store: StoreRouter = new StoreRouter();
   private common: CommonRoutes = new CommonRoutes();
   private order: OrderRoutes = new OrderRoutes();
+  private payment: PaymentRouters = new PaymentRouters();
+  private articles: ArticlesRouters = new ArticlesRouters();
 
   constructor() {
     this.app = express();
@@ -39,6 +43,9 @@ class App {
     this.store.router(this.app);
     this.discount.router(this.app);
     this.order.route(this.app);
+    this.order.route(this.app);
+    this.payment.route(this.app);
+    this.articles.route(this.app);
     this.common.route(this.app);
   }
 
