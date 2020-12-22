@@ -7,7 +7,10 @@ import { AuthRoute } from "../routes/auth";
 import { UserRoutes } from "../routes/user";
 import { ProductRoutes } from "../routes/product";
 import { OrderRoutes } from "../routes/order";
+import { DiscountRouter } from '../routes/discount';
+import { StoreRouter } from "../routes/store";
 import { CommonRoutes } from "../routes/common";
+
 
 import * as cors from "cors";
 import * as cookieParser from "cookie-parser";
@@ -20,6 +23,8 @@ class App {
   private auth: AuthRoute = new AuthRoute();
   private user: UserRoutes = new UserRoutes();
   private product: ProductRoutes = new ProductRoutes();
+  private discount: DiscountRouter = new DiscountRouter();
+  private store: StoreRouter = new StoreRouter();
   private common: CommonRoutes = new CommonRoutes();
   private order: OrderRoutes = new OrderRoutes();
 
@@ -31,8 +36,10 @@ class App {
     this.auth.route(this.app);
     this.product.route(this.app);
     this.user.route(this.app);
-    this.common.route(this.app);
+    this.store.router(this.app);
+    this.discount.router(this.app);
     this.order.route(this.app);
+    this.common.route(this.app);
   }
 
   private config(): void {

@@ -8,7 +8,7 @@ export default class StoreService{
     }
     public updateStrore( storeParams: IStore, callback: any){
         const query = {_id: storeParams._id};
-        store.findOneAndUpdate(query, storeParams, callback);
+        store.findOneAndUpdate(query, storeParams,{ new: true }, callback);
     }
     public deleteStore(_id: String, callback: any){
         const query = {_id: _id};
@@ -17,5 +17,8 @@ export default class StoreService{
     public findOne(_id: String, callback: any){
         const query = {_id: _id};
         store.findById(_id, callback);
+    }
+    public getAllStore(query: any, callback: any){
+        store.find(query, callback)
     }
 }

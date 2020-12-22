@@ -11,6 +11,9 @@ import OrderService from "../modules/orders/service";
 const sha256 = require("sha256");
 import app from "config/app";
 import ProductService from "../modules/products/service";
+import DiscountService from "../modules/discount/service";
+import { IDiscount } from "modules/discount/model";
+
 const queryString = require("qs");
 require("dotenv").config();
 const sortObject = (o: any): any => {
@@ -34,6 +37,7 @@ const sortObject = (o: any): any => {
 export class OrderController {
   private ordersService: OrderService = new OrderService();
   private productService: ProductService = new ProductService();
+  private discountService : DiscountService = new DiscountService();
   public getAllOrders(req: Request, res: Response) {
     const orderFilter = {};
     this.ordersService.filterAllOrder(
@@ -70,31 +74,46 @@ export class OrderController {
       const {
         order_items,
         vnp_BankCode,
+        name,
         customer_id,
-        shipping_address,
-        billing_address,
+        address,
+        discount_code,
         phone_number,
         payment_method,
-        store_id,
-        staff_id,
       } = req.body;
+      const {firstName, lastName} = name;
       if (order_items && order_items.length > 0 && vnp_BankCode) {
         const idArray = order_items.map((item) => item.product_id);
         const products = await this.productService
           .asyncFilterProduct({ _id: { $in: idArray } })
           .exec();
+        const discount:any  = await this.discountService.asyncFilterDiscount({discount_code: discount_code});
+        if(!discount) return res.status(400).json({
+          message: "Discount code is invalid"
+        })
+        const now = new Date().getTime();
+        const discountBegin = discount.begin.getTime();
+        const discountEnd= discount.end.getTime();
+        if(now < discountBegin || now > discountEnd){
+          return res.status(400).json({
+            message: "Discount code is invalid"
+          })
+        }
         const newOrder = await this.ordersService.asyncCreateOrder({
           customer_id,
-          shipping_address,
-          billing_address,
+          address,
+          name:{
+            firstName,
+            lastName
+          },
           phone_number,
           payment_method,
-          store_id,
-          staff_id,
+          discount:discount._id,
           order_items,
         });
         const { _id } = newOrder;
-        const vnp_Amount =
+        
+        const total =
           products.reduce((pre, prod) => {
             return (
               pre +
@@ -102,18 +121,19 @@ export class OrderController {
               prod.price_sales *
                 order_items.find((prd) => prd.product_id == prod._id).quantity
             );
-          }, 0) * 100;
+          }, 0);
+          const vnp_Amount = total * (1-discount.discount)
         const host = req.headers.host;
         const vnp_ReturnUrl = `http://${host}${process.env.VNPAY_RETURN}/${_id}`;
         let vnp_Params = {
           vnp_Version: 2,
           vnp_Command: "pay",
           vnp_TmnCode: process.env.VNPAY_TMNCODE,
-          vnp_Amount,
+          vnp_Amount: vnp_Amount*100,
           vnp_Locale: "vn",
           vnp_CurrCode: "VND",
           vnp_TxnRef: dateformat(new Date(), "HHmmss"),
-          vnp_OrderInfo: `TOTTI STORE payment, cost: ${vnp_Amount / 100}VND`,
+          vnp_OrderInfo: `TOTTI STORE payment, cost: ${vnp_Amount}VND`,
           vnp_OrderType: 25000,
           vnp_IpAddr,
           vnp_BankCode,
@@ -200,17 +220,19 @@ export class OrderController {
   }
   public createdOrder(req: Request, res: Response) {
     if (
-      req.body.customer_id &&
-      req.body.status &&
       req.body.order_date &&
-      req.body.discount_code &&
-      req.body.store_id &&
-      req.body.staff_id
+      req.body.name &&
+      req.body.address &&
+      req.body.phoneNumber  
     ) {
+      const { firstName, lastName } = req.body.name || {};
       const orderParams: IOrder = {
         customer_id: req.body.customer_id,
         status: req.body.status,
-        // name
+        name:{
+          firstName,
+          lastName
+        },
         order_date: req.body.order_date,
         discount_code: req.body.discount_code,
         address: req.body.address,
