@@ -7,6 +7,8 @@ import { AuthRoute } from "../routes/auth";
 import { UserRoutes } from "../routes/user";
 import { ProductRoutes } from "../routes/product";
 import { OrderRoutes } from "../routes/order";
+import { PaymentRouters } from "../routes/payment";
+import { ArticlesRouters } from "../routes/articles";
 import { CommonRoutes } from "../routes/common";
 
 import * as cors from "cors";
@@ -20,8 +22,10 @@ class App {
   private auth: AuthRoute = new AuthRoute();
   private user: UserRoutes = new UserRoutes();
   private product: ProductRoutes = new ProductRoutes();
-  private common: CommonRoutes = new CommonRoutes();
   private order: OrderRoutes = new OrderRoutes();
+  private payment: PaymentRouters = new PaymentRouters();
+  private articles: ArticlesRouters = new ArticlesRouters();
+  private common: CommonRoutes = new CommonRoutes();
 
   constructor() {
     this.app = express();
@@ -31,8 +35,10 @@ class App {
     this.auth.route(this.app);
     this.product.route(this.app);
     this.user.route(this.app);
-    this.common.route(this.app);
     this.order.route(this.app);
+    this.payment.route(this.app);
+    this.articles.route(this.app);
+    this.common.route(this.app);
   }
 
   private config(): void {
