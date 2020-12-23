@@ -29,7 +29,7 @@ class App {
   private store: StoreRouter = new StoreRouter();
   private common: CommonRoutes = new CommonRoutes();
   private order: OrderRoutes = new OrderRoutes();
-  private payment: PaymentRouters = new PaymentRouters();
+  // private payment: PaymentRouters = new PaymentRouters();
   private articles: ArticlesRouters = new ArticlesRouters();
 
   constructor() {
@@ -44,7 +44,7 @@ class App {
     this.discount.router(this.app);
     this.order.route(this.app);
     this.order.route(this.app);
-    this.payment.route(this.app);
+    // this.payment.route(this.app);
     this.articles.route(this.app);
     this.common.route(this.app);
   }

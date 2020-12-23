@@ -6,8 +6,8 @@ enum articlesStatus {
 
 export interface Iarticles {
 	_id?: String,
-	name: String,
-	discription: String,
+	name: Number,
+	description: String,
 	summary: String,
 	body: String,
 	image: String,

@@ -7,10 +7,12 @@ export class ArticlesController {
 
 	public createArticles(req: Request, res: Response) {
 		const article = new articles({
-			heading: req.body.heading,
-			content: req.body.content,
+			name: req.body.name,
+			description: req.body.description,
+			summary: req.body.summary,
+			body: req.body.body,
 			image: req.body.image,
-			author: req.body.author
+			user_id: req.body.user_id
 		});
 		article.save();
 		res.send("Created articles success");
