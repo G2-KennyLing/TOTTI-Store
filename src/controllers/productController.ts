@@ -41,16 +41,12 @@ export class ProductController {
         description: req.body.description,
         unit_price: req.body.unit_price,
         price_sales: req.body.price_sales,
-        discount: req.body.discount,
         SKU: req.body.SKU,
         quantity: req.body.quantity,
         size: req.body.size,
         color: req.body.color,
-        product_image: {
-            link: req.body.product_image.link,
-        },
+        product_image: [req.body.linkImage],
         category_id: req.body.category_id,
-        provider_id: req.body.provider_id,
         store_id: req.body.store_id,
         //@ts-ignore
         modificationNotes: [{
