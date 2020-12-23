@@ -12,6 +12,14 @@ import express = require("express");
 export class StoreController {
     private storeService: StoreService = new StoreService();
 
+    public getAllStore(req: Request, res: Response) {
+        this.storeService.getAllStore({}, (err: Error, storeData: IStore) =>{
+            if(err){
+                return mongoError(err, res);
+            }
+            return successResponse("get all store successfull", storeData, res);
+        })
+    }
     public createStore(req: Request, res: Response) {
         if (req.body.name && req.body.address && req.body.phoneNumber && req.body.email) {
             const storeParams: IStore = {
@@ -27,7 +35,6 @@ export class StoreController {
             }
             this.storeService.createStore(storeParams, (err: any, storeData: IStore) => {
                 if (err) {
-                    console.log(err);
                     return mongoError(err, res);
                 } else
                     successResponse("create store successfull", storeData, res);
@@ -73,7 +80,7 @@ export class StoreController {
                     return mongoError(err, res);
                 }
                 if (deleteDetails.deletedCount !== 0) {
-                    return successResponse("Delete store succsessfull", null, res);
+                    return successResponse("Delete store successfull", null, res);
                 }
                 return failureResponse("Invalid store", null, res);
             })

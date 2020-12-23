@@ -6,21 +6,24 @@ enum productStatus{
 	DELIVERED
 }
 export interface IOrder {
-  _id?: String;
-  customer_id?: Number;
-  status: Number;
+	_id?: String;
+  customer_id?: String;
+  status: productStatus;
   order_date: Date;
-  shipping_address: String;
-  billing_address: String;
+  name: {
+    firstName: String;
+    lastName: String;
+  };
+  payment?: Object;
+  address: String;
+  phone_number: String;
   payment_method: Number;
   discount_code?: String;
-  store_id: String;
-  phone_number: String;
-  staff_id: String;
   order_items: [
     {
       product_id: String;
       quantity: Number;
     }
   ];
+
 }
