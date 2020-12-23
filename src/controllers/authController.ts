@@ -167,7 +167,7 @@ export class AuthController {
 
   public isAdmin = (req: Request, res: Response, next: NextFunction) => {
     //@ts-ignore
-    const isAdmin = req.user.role == 2;
+    const isAdmin = req.user.role >= 2;
     if (!isAdmin) {
       return res.status(400).json({
         message: "You are not Admin, access denied",
@@ -178,7 +178,7 @@ export class AuthController {
 
   public isEditor = (req: Request, res: Response, next: NextFunction) => {
     //@ts-ignore
-    const isEditor = req.user.role == 1;
+    const isEditor = req.user.role >= 1;
     if (isEditor) {
       return res.status(400).json({
         message: "You are not Editor, access denied",

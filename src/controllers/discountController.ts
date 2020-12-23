@@ -34,7 +34,7 @@ export class DiscountController {
             discount,
             modificationNotes: [{
                 modifiedOn: new Date(),
-                modifiedBy: null,
+                modifiedBy: "Editor",
                 modificationNote: "New discout created"
             }]
         }
@@ -61,7 +61,7 @@ export class DiscountController {
             discount,
             modificationNotes:[{
                 modifiedOn:new Date(),
-                modifiedBy: null,
+                modifiedBy: "Editor",
                 modificationNote: "discount updated"
             }]
         }

@@ -35,4 +35,7 @@ export default class UserService {
     const query = { _id: _id };
     users.deleteOne(query, callback);
   }
+  public getAllUser(query: any, callback: any){
+    users.find(query, callback);
+  }
 }

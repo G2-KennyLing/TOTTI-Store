@@ -26,9 +26,9 @@ export class StoreRouter{
             this.storeController.deleteStore(req, res);
         });
         app.get("/store",
-        this.authController.isSignIn,
-        this.authController.isEditor,
         (req, res) =>{
+            this.authController.isSignIn,
+            this.authController.isEditor,
             this.storeController.getAllStore(req, res);
         });
     }
