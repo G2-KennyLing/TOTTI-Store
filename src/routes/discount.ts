@@ -26,9 +26,9 @@ export class DiscountRouter{
             this.discountController.deleteDiscount(req, res)
         });
         app.get("/discount",
-        this.authController.isSignIn,
-        this.authController.isEditor, 
         (req:Request, res:Response) =>{
+            this.authController.isSignIn,
+            this.authController.isEditor,
             this.discountController.getAllDiscount(req, res)
         });
     }

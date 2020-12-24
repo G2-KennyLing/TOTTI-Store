@@ -29,7 +29,7 @@ export class StoreController {
                 email: req.body.email,
                 modificationNotes: [{
                     modifiedOn: new Date,
-                    modifiedBy: null,
+                    modifiedBy: "Editor",
                     modificationNote: "New Store created"
                 }]
             }
@@ -55,7 +55,7 @@ export class StoreController {
             email: email,
             modificationNotes: [{
                 modifiedOn: new Date,
-                modifiedBy: null,
+                modifiedBy: "Editor",
                 modificationNote: "Store data update"
             }]
         }
