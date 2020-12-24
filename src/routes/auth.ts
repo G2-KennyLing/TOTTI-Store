@@ -1,13 +1,14 @@
 import { AuthController } from "../controllers/authController";
 import { Application, NextFunction, Request, Response } from "express";
-import SignupValidator from '../middleware/validatorResigter';
+import SignupValidator from "../middleware/validatorResigter";
 
 export class AuthRoute {
   private authController: AuthController = new AuthController();
   private signupValidate: SignupValidator = new SignupValidator();
 
   public route(app: Application) {
-    app.post("/auth/register",
+    app.post(
+      "/auth/register",
       this.signupValidate.userSignupValidator,
       this.signupValidate.validateResult,
       (req: Request, res: Response, next: NextFunction) => {
@@ -30,8 +31,11 @@ export class AuthRoute {
     app.get("/auth/logout", (req: Request, res: Response) => {
       this.authController.signOut(req, res);
     });
-
-    app.get("/auth/test",
+    app.post("/admin", (req: Request, res: Response) => {
+      this.authController.adminLogin(req, res);
+    });
+    app.get(
+      "/auth/test",
       this.authController.isSignIn,
       (req: Request, res: Response) => {
         //@ts-ignore

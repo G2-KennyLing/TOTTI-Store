@@ -6,16 +6,12 @@ export interface IProduct {
 	description: String,
     unit_price: Number,
 	price_sales: Number,
-	discount: Number,
 	SKU: String,
-	quantity: Number,
+	quantity: Number, 
 	size: String,
-	color: String,
-	product_image: { 
-			link: String
-	},
-	category_id: Number,
-	provider_id: Number,
-	store_id: Number,
+	color: String, 
+	product_image: String[],
+	category_id: String,
+	store_id: String,
 	modificationNotes: ModificationNote[]
 }

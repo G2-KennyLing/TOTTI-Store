@@ -9,12 +9,8 @@ import { IUser } from "../modules/users/model";
 import UserService from "../modules/users/service";
 import express = require("express");
 import jwt = require("jsonwebtoken");
-import sgMail = require("@sendgrid/mail");
-import { resolve } from "path";
-import Nodemailer from "../helpers/sendgird";
-
+import Nodemailer from "../helpers/verifyEmail";
 require("dotenv").config();
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export class UserController {
   private userService: UserService = new UserService();
@@ -163,5 +159,90 @@ export class UserController {
     } else {
       insufficientParameters(res);
     }
+  }
+  public createUser(req: Request, res: Response) {
+    const {name, email, password, phoneNumber, gender, role} = req.body;
+    const { firstName, lastName } = name;
+    if(!(firstName && lastName && email && password && role)){
+      return insufficientParameters(res);
+    }
+    const userParams: IUser = {
+      name:{
+        firstName,
+        lastName
+      },
+      email,
+      password,
+      phoneNumber,
+      gender,
+      role,
+      modificationNotes:[{
+        modifiedOn: new Date(Date.now()),
+        modifiedBy: "Admin",
+        modificationNote:"New user created"
+      }]
+    }
+    this.userService.createUser(userParams, (err: Error, userData: IUser) =>{
+      if(err){
+        return mongoError(err, res);
+      }
+      return successResponse("create user successfull", userData, res);
+    })
+  }
+  public updateUserByAdmin(req: Request, res: Response){
+    const { name, email, password, phoneNumber, gender, role } = req.body;
+    const { firstName, lastName } = name || {};
+    if (
+      !(firstName && lastName && email && password && phoneNumber && gender && role)
+    ) {
+      return insufficientParameters(res);
+    } else {
+      const userFilter = { _id: req.params.id };
+      this.userService.filterUser(userFilter, (err: any, userData: IUser) => {
+        if (err) {
+          return mongoError(err, res);
+        }
+        if (userData) {
+          const userParams: IUser = {
+            _id: req.params.id,
+            name: name
+              ? {
+                  firstName: firstName ? firstName : userData.name.firstName,
+                  lastName: lastName ? lastName : userData.name.lastName,
+                }
+              : userData.name,
+            email: email ? email : userData.email,
+            password: password ? password : userData.password,
+            phoneNumber: phoneNumber ? phoneNumber : userData.phoneNumber,
+            gender: gender ? gender : userData.gender,
+            role: role ? role : userData.role,
+            modificationNotes: [
+              {
+                modifiedOn: new Date(Date.now()),
+                modifiedBy: "Admin",
+                modificationNote: "User data updated",
+              },
+            ],
+          };
+          this.userService.updateUser(userParams, (err: any) => {
+            if (err) {
+              mongoError(err, res);
+            } else {
+              successResponse("Update user successful", userParams, res);
+            }
+          });
+        } else {
+          failureResponse("Invalid user", null, res);
+        }
+      });
+    }
+  }
+  public getAllUser(req: Request, res: Response){
+    this.userService.getAllUser({}, (err: any, userData: IUser) =>{
+      if(err){
+        return mongoError(err, res);
+      }
+      return successResponse("get all user successfull", userData, res);
+    })
   }
 }

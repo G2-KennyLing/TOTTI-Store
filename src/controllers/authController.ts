@@ -6,17 +6,13 @@ import {
   failureResponse,
 } from "../modules/common/service";
 import { IUser } from "../modules/users/model";
-import sgMail = require("@sendgrid/mail");
 import UserService from "../modules/users/service";
-import TokenService from "../modules/tokens/service";
 import jwt = require("jsonwebtoken");
-import Nodemailer from "../helpers/sendgird";
+import Nodemailer from "../helpers/verifyEmail";
 require("dotenv").config();
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export class AuthController {
   private userService: UserService = new UserService();
-  private tokenService: TokenService = new TokenService();
   public mailer: Nodemailer = new Nodemailer();
 
   public signUp = async (req: Request, res: Response, next: NextFunction) => {
@@ -152,6 +148,10 @@ export class AuthController {
           return res.status(400).json({
             message: "token is not valid",
           });
+<<<<<<< HEAD
+=======
+        //@ts-ignore
+>>>>>>> 9524c319c307055f5afb1460b68a16e958a81a9f
         const { user } = decoded;
         this.userService.createUser(user, (err, user) => {
           if (err)
@@ -170,7 +170,7 @@ export class AuthController {
 
   public isAdmin = (req: Request, res: Response, next: NextFunction) => {
     //@ts-ignore
-    const isAdmin = req.user.role == 2;
+    const isAdmin = req.user.role >= 2;
     if (!isAdmin) {
       return res.status(400).json({
         message: "You are not Admin, access denied",
@@ -181,7 +181,7 @@ export class AuthController {
 
   public isEditor = (req: Request, res: Response, next: NextFunction) => {
     //@ts-ignore
-    const isEditor = req.user.role == 1;
+    const isEditor = req.user.role >= 1;
     if (isEditor) {
       return res.status(400).json({
         message: "You are not Editor, access denied",
@@ -211,7 +211,27 @@ export class AuthController {
       });
     });
   }
-
+  public async adminLogin(req: Request, res: Response) {
+    const { email, password } = req.body;
+    const user = this.userService.filterUser({ email }, (err, user) => {
+      if (err) return mongoError(err, res);
+      if (!user)
+        return res.status(400).json({
+          message: "Email is not exists",
+        });
+      if (!user.authenticate(password))
+        return res.status(400).json({
+          message: "Email and password are not match",
+        });
+      if (user.role != 2)
+        return res.status(400).json({
+          message: "Admin required",
+        });
+      return res.status(200).json({
+        message: "Signin successful",
+      });
+    });
+  }
   public signOut(req: Request, res: Response) {
     res.clearCookie("token");
     res.clearCookie("refreshToken");
