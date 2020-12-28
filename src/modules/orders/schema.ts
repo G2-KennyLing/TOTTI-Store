@@ -11,27 +11,48 @@ interface order_item {
   quantity: Number;
 }
 const Orders = new Schema({
-  customer_id: String,
-  status: String,
-  order_date: Date,
-  shipping_address: String,
-  billing_address: String,
+  customer_id: {
+    type: Schema.Types.ObjectId,
+    ref: "users"  
+  },
+  status: {
+    type: Number,
+    enum: [0,1,2],
+    default: 0
+  },
+  order_date: {
+    type: Date
+  },
+  name:{
+    type:{
+      firstName: String,
+      lastName: String
+    },
+    trim: true
+  },
+  payment: {
+    type: Object,
+    default: {},
+  },
+  address: {
+    type: String
+  },
   phone_number: {
     type: String,
+    trim: true
   },
   payment_method: {
     type: Number,
     enum: [0, 1],
     default: 0,
   },
-  payment: {
-    type: Object,
-    default: {},
+  discount_code: {
+    type: Schema.Types.ObjectId,
+    ref: "discount"
   },
-  ship_date: Date,
-  discount_code: String,
-  store_id: String,
-  staff_id: String,
+  ship_date: {
+    type: Date
+  },
   order_items: {
     type: [
       {
@@ -42,7 +63,7 @@ const Orders = new Schema({
         },
       },
     ],
-  },
+  },  
   //@ts-ignore
   modificationNote: [ModificationNote],
 });

@@ -24,4 +24,4 @@ const Stores = new Schema({
     
 });
 
-export default mongoose.model("Store", Stores, "stores")
+export default mongoose.model("store", Stores, "stores")
