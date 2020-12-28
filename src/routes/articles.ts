@@ -20,6 +20,10 @@ export class ArticlesRouters {
 			this.articlesController.createArticles(req, res);
 		});
 
+		app.get('/articles/:id', (req: Request, res: Response) => {
+			this.articlesController.getArticles(req, res);
+		})
+
 		app.put('/articles/:id', (req: Request, res:Response, next) => {
 			this.articlesController.updateArticles(req, res, next);
 		});

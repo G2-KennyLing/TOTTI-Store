@@ -9,6 +9,10 @@ export default class ArticlesService {
 		newArticles.save(callback);
 	}
 
+	public getArticles(query: any, callback: any) {
+		articles.findById(query, callback)
+	}
+
 	public updateArticles(articlesParams: Iarticles, callback: any){
 		const query = { _id: articlesParams._id };
 		articles.findOneAndUpdate(query, articlesParams, callback);

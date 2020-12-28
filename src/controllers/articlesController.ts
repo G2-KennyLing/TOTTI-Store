@@ -27,6 +27,20 @@ export class ArticlesController {
 			})
 		}
 	}
+	
+	public getArticles(req: Request, res: Response) {
+		const articlesId = { _id: req.params.id };
+		this.articlesService.getArticles(
+			articlesId,(err: any, articlesData: Iarticles ) => {
+				if(!articlesData){
+					failureResponse("Articles not found", articlesData, res)
+				}else {
+					successResponse(null, articlesData, res)
+				}
+			}
+
+		)
+	}
 
 	public updateArticles(req: Request, res: Response, next) {
 		const { name, description, summary, body, image } = req.body;
@@ -48,7 +62,7 @@ export class ArticlesController {
 			if (!articlesData) {
 				return failureResponse("Articles update failed", {}, res)
 			}else {
-				successResponse("Articles update suceess", { articlesData }, res)
+				successResponse("Articles update success", { articlesData }, res)
 			}
 		})
 	}
@@ -62,7 +76,7 @@ export class ArticlesController {
 				if (err) {
 					return mongoError(err, res);
 				}else {
-					return successResponse("Deleted success", {}, res)
+					return successResponse("Deleted articles success", {}, res)
 				}
 			})
 		}
