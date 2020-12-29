@@ -2,7 +2,6 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 import * as mongoose from "mongoose";
 import environment from "../environment";
-
 import { AuthRoute } from "../routes/auth";
 import { UserRoutes } from "../routes/user";
 import { ProductRoutes } from "../routes/product";
@@ -16,6 +15,10 @@ import { CommonRoutes } from "../routes/common";
 
 import * as cors from "cors";
 import * as cookieParser from "cookie-parser";
+
+
+var session = require("express-session");
+let MongoStore = require('connect-mongo')(session);
 
 class App {
   public app: express.Application;
@@ -53,10 +56,23 @@ class App {
     this.app.use(bodyParser.json());
     require("dotenv").config();
     this.app.use(bodyParser.urlencoded({ extended: false }));
+    this.app.use(session(
+      {
+        secret: "test",
+        resave: false,//we are telling store not to open any new connection but use existing connection instead
+        saveUninitialized: false,
+        store: new MongoStore({ mongooseConnection: mongoose.connection }),
+        cookie: { maxAge: 180 * 60 * 1000 }//min sec milisec cookie how much long is session
+      }))
+      this.app.use((req,res,next)=>{
+        res.locals.session = req.session
+        next();
+       });
     this.app.use(cors());
     this.app.use(express.json());
     this.app.use(cookieParser());
   }
+
 
   private mongoSetup(): void {
     mongoose
