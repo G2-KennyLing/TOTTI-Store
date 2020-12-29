@@ -37,7 +37,7 @@ const sortObject = (o: any): any => {
 export class OrderController {
   private ordersService: OrderService = new OrderService();
   private productService: ProductService = new ProductService();
-  private discountService : DiscountService = new DiscountService();
+  private discountService: DiscountService = new DiscountService();
   public getAllOrders(req: Request, res: Response) {
     const orderFilter = {};
     this.ordersService.filterAllOrder(
@@ -65,22 +65,6 @@ export class OrderController {
       }
     );
   }
-<<<<<<< HEAD
-
-  public createdOrder(req: Request, res: Response) {
-    if (
-      req.body.customer_id &&
-      req.body.store_id &&
-      req.body.staff_id &&
-      req.body.order_items
-    ) {
-      const orderParams: IOrder = {
-        customer_id: req.body.customer_id,
-        order_date: new Date(),
-        discount_code: req.body.discount_code,
-        store_id: req.body.store_id,
-        staff_id: req.body.staff_id,
-=======
   public async createOnlinePaymentOrder(req: Request, res: Response) {
     try {
       const vnp_IpAddr =
@@ -97,55 +81,57 @@ export class OrderController {
         phone_number,
         payment_method,
       } = req.body;
-      const {firstName, lastName} = name;
+      const { firstName, lastName } = name;
       if (order_items && order_items.length > 0 && vnp_BankCode) {
         const idArray = order_items.map((item) => item.product_id);
         const products = await this.productService
           .asyncFilterProduct({ _id: { $in: idArray } })
           .exec();
-        const discount:any  = await this.discountService.asyncFilterDiscount({discount_code: discount_code});
-        if(!discount) return res.status(400).json({
-          message: "Discount code is invalid"
-        })
+        const discount: any = await this.discountService.asyncFilterDiscount({
+          discount_code: discount_code,
+        });
+        if (!discount)
+          return res.status(400).json({
+            message: "Discount code is invalid",
+          });
         const now = new Date().getTime();
         const discountBegin = discount.begin.getTime();
-        const discountEnd= discount.end.getTime();
-        if(now < discountBegin || now > discountEnd){
+        const discountEnd = discount.end.getTime();
+        if (now < discountBegin || now > discountEnd) {
           return res.status(400).json({
-            message: "Discount code is invalid"
-          })
+            message: "Discount code is invalid",
+          });
         }
         const newOrder = await this.ordersService.asyncCreateOrder({
           customer_id,
           address,
-          name:{
+          name: {
             firstName,
-            lastName
+            lastName,
           },
           phone_number,
           payment_method,
-          discount:discount._id,
+          discount: discount._id,
           order_items,
         });
         const { _id } = newOrder;
-        
-        const total =
-          products.reduce((pre, prod) => {
-            return (
-              pre +
-              //@ts-ignore
-              prod.price_sales *
-                order_items.find((prd) => prd.product_id == prod._id).quantity
-            );
-          }, 0);
-          const vnp_Amount = total * (1-discount.discount)
+
+        const total = products.reduce((pre, prod) => {
+          return (
+            pre +
+            //@ts-ignore
+            prod.price_sales *
+              order_items.find((prd) => prd.product_id == prod._id).quantity
+          );
+        }, 0);
+        const vnp_Amount = total * (1 - discount.discount);
         const host = req.headers.host;
         const vnp_ReturnUrl = `http://${host}${process.env.VNPAY_RETURN}/${_id}`;
         let vnp_Params = {
           vnp_Version: 2,
           vnp_Command: "pay",
           vnp_TmnCode: process.env.VNPAY_TMNCODE,
-          vnp_Amount: vnp_Amount*100,
+          vnp_Amount: vnp_Amount * 100,
           vnp_Locale: "vn",
           vnp_CurrCode: "VND",
           vnp_TxnRef: dateformat(new Date(), "HHmmss"),
@@ -239,22 +225,21 @@ export class OrderController {
       req.body.order_date &&
       req.body.name &&
       req.body.address &&
-      req.body.phoneNumber  
+      req.body.phoneNumber
     ) {
       const { firstName, lastName } = req.body.name || {};
       const orderParams: IOrder = {
         customer_id: req.body.customer_id,
         status: req.body.status,
-        name:{
+        name: {
           firstName,
-          lastName
+          lastName,
         },
         order_date: req.body.order_date,
         discount_code: req.body.discount_code,
         address: req.body.address,
         phone_number: req.body.phone_number,
         payment_method: req.body.payment_method,
->>>>>>> 9524c319c307055f5afb1460b68a16e958a81a9f
         order_items: req.body.order_items,
       };
       this.ordersService.createOrder(
