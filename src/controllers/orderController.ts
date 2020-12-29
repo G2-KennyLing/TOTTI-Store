@@ -65,6 +65,22 @@ export class OrderController {
       }
     );
   }
+<<<<<<< HEAD
+
+  public createdOrder(req: Request, res: Response) {
+    if (
+      req.body.customer_id &&
+      req.body.store_id &&
+      req.body.staff_id &&
+      req.body.order_items
+    ) {
+      const orderParams: IOrder = {
+        customer_id: req.body.customer_id,
+        order_date: new Date(),
+        discount_code: req.body.discount_code,
+        store_id: req.body.store_id,
+        staff_id: req.body.staff_id,
+=======
   public async createOnlinePaymentOrder(req: Request, res: Response) {
     try {
       const vnp_IpAddr =
@@ -238,6 +254,7 @@ export class OrderController {
         address: req.body.address,
         phone_number: req.body.phone_number,
         payment_method: req.body.payment_method,
+>>>>>>> 9524c319c307055f5afb1460b68a16e958a81a9f
         order_items: req.body.order_items,
       };
       this.ordersService.createOrder(

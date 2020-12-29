@@ -148,7 +148,10 @@ export class AuthController {
           return res.status(400).json({
             message: "token is not valid",
           });
+<<<<<<< HEAD
+=======
         //@ts-ignore
+>>>>>>> 9524c319c307055f5afb1460b68a16e958a81a9f
         const { user } = decoded;
         this.userService.createUser(user, (err, user) => {
           if (err)
