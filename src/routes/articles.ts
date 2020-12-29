@@ -11,14 +11,18 @@ export class ArticlesRouters {
 		let urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 		app.post('/articles/create', urlencodedParser, [
-			check('name', 'Tiêu đề không được ngắn quá dưới 10 kí tự').notEmpty(),
-			check('description', 'Mô tả không được dài quá 50 kí tự').notEmpty(),
-			check('summary', 'Trường này không được bỏ trống').notEmpty(),
-			check('body', 'Trường này không được bỏ trống').notEmpty(),
-			check('image', 'Trường này không được bỏ trống').notEmpty()
+			check('name', 'Name is not more than character 10').notEmpty(),
+			check('description', 'Description is not more than character 50').notEmpty(),
+			check('summary', 'This field not empty').notEmpty(),
+			check('body', 'This field not empty').notEmpty(),
+			check('image', 'This field not empty').notEmpty()
 			], (req: Request, res:Response) => {
 			this.articlesController.createArticles(req, res);
 		});
+
+		app.get('/articles/:id', (req: Request, res: Response) => {
+			this.articlesController.getArticles(req, res);
+		})
 
 		app.put('/articles/:id', (req: Request, res:Response, next) => {
 			this.articlesController.updateArticles(req, res, next);
