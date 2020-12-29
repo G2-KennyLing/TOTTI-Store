@@ -20,7 +20,7 @@ export class AuthController {
       const { name, email, password, phoneNumber, gender } = req.body;
       const { firstName, lastName } = name || {};
       if (
-        !(firstName && lastName && email && password && phoneNumber && gender)
+        !(firstName && lastName && email && password && phoneNumber)
       ) {
         return insufficientParameters(res);
       }
@@ -148,10 +148,7 @@ export class AuthController {
           return res.status(400).json({
             message: "token is not valid",
           });
-<<<<<<< HEAD
-=======
         //@ts-ignore
->>>>>>> 9524c319c307055f5afb1460b68a16e958a81a9f
         const { user } = decoded;
         this.userService.createUser(user, (err, user) => {
           if (err)
